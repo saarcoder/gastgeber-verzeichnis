@@ -1,0 +1,2485 @@
+<html><head><link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="gastgeber-icons.html">
+<link rel="icon" href="images/manifest/favicon.ico">
+<link href="https://fonts.googleapis.com/css?family=Cormorant:700|Caveat:400" rel="stylesheet">
+
+</head><body><dom-module id="gastgeber-net">
+
+	<template>
+
+		<style>
+			:host {
+				display: block;
+				--app-primary-color: #19b3ec;
+				--app-secondary-color: #076499;
+			}
+			a {
+				text-decoration: none;
+				color: inherit;
+			}     
+			ul {				
+				margin: 0;
+				padding: 0;
+				-webkit-padding-start: 0;
+			} 
+			li {
+				list-style-type: none;
+				display: inline;
+			}
+			h2, h3, ul, li, a {
+			    -webkit-margin-before: 0;
+    			-webkit-margin-after: 0;
+				-webkit-padding-start: 0;
+			}
+			app-drawer-layout {
+				background: #fff;
+			}
+			app-header {
+				height: 60vw;
+				width: 100%;
+				color: #fff;
+				--app-header-background-front-layer: {
+					background-image: url(../images/travel-lr.jpg);
+					background-position: left top;
+					background-repeat: no-repeat;
+					-webkit-backdrop-filter: saturate(150%);
+					backdrop-filter: saturate(150%);
+					z-index: -1;
+				};
+				--app-header-background-rear-layer: {					
+					background-color: var(--app-secondary-color);
+					z-index: -1;
+				}
+				;			
+			}			
+			.tallBar {				
+				padding: 0;
+				height: 60vw;
+				display: flex;
+				flex-direction: column;				
+			}
+			.tallBar > paper-icon-button {
+				position: absolute;
+				left: 0;
+				top: 0;
+				--paper-icon-button-ink-color: lightblue;
+			}
+			#bar {	
+				position: absolute;
+				left: 0;
+				width: 100vw;
+				height: 2.25rem;
+				background-color: rgba(255,255,255,.6);
+			}
+			form#schnellsuche {
+				position: relative;
+				height: 2.25rem;
+				width: 60vw;
+				margin: 0 auto;
+				z-index: 1;
+			}
+			paper-input {			
+				height: 36px;	
+				margin-top: -15px;
+				font-weight: 100;
+				--paper-input-container-color: var(--app-secondary-color);
+				--paper-input-container-focus-color: var(--app-primary-color);
+				--paper-input-container-invalid-color: limegreen;
+				--paper-input-container-underline: {					
+				}
+				--paper-input-container-underline: {
+					display: none;
+				};
+				--paper-input-container-underline-focus: {
+					font-weight: 100;
+				};
+				--paper-input-container: {
+					height: 36px;	
+					padding: 0;
+					margin: 0;
+				};
+				--paper-input-container-label: {
+					margin-top: 7px;
+					line-height: 1;
+					font-size: 1rem;
+					font-weight: 500;
+					letter-spacing: .3px;
+					text-align: center;
+					text-shadow: 1px -1px #ccc;
+				};
+				--paper-input-container-label-focus: {
+					font-weight: 100;
+				};
+				--paper-input-container-label-floating: {
+					margin-top: .75rem;
+					font-size: .8rem;
+					padding-bottom: .2rem;		
+					text-shadow: 1px -1px #bbb;
+				};
+				--paper-input-container-input: {
+					font-size: .9rem;
+					font-weight: 100;
+					margin-top: .2rem;
+					margin-bottom: -.2rem;
+					letter-spacing: .5px;		
+					color: var(--app-secondary-color);		
+					text-shadow: 1px -1px #bbb;
+					text-align: center;
+				};
+			}
+			.tallBar form input {
+				display: none;
+			}
+			[main-title] img {
+				position: absolute;
+				top: 0;
+				right: 0;
+				height: 1.8rem;
+				width: 1.8rem;
+				margin:.25rem .5rem 0 .25rem;
+				transform: rotate(-5deg);
+			}		
+										
+			[main-title] h1 {
+				font: 10vw 'Caveat', cursive;
+				font-weight: 100;
+				text-shadow: 0 0 8px #000;
+				letter-spacing: 2px;
+				text-align: center;
+				color: #fff;
+				margin-top: 35vw;
+			}			
+			#wrapperHdrBtm {
+				margin-top: 7vw;
+			}
+			.rwdwn {
+				position: relative;
+				width: 100vw;
+				height: 0;
+				z-index: -1;
+			}			
+			.rwdwn::before {
+				position: absolute;
+				content: '';
+				left: 0;
+				bottom: 0;
+				width: 0;
+				height: 0;
+				border-left: 50vw solid #fff;
+				border-right: 50vw solid #fff;
+				border-top: 5vw solid transparent;
+				z-index: -1;
+			}		
+			#ribbon {
+				position: absolute;
+				margin: -7vw auto 0 auto;
+				left: calc(50vw - 78.3px);
+				height: 13px;
+				border-radius: 2px;
+				padding: 8px 12px 8px 12px;
+				color: #fff;
+				font: 13px 'Caveat', cursive;
+				text-align: center;
+				letter-spacing: 1px;
+				text-shadow: 0px -1px 1px rgba(0, 0, 0, 0.7);
+				box-shadow: inset 0px 1px 5px rgba(255, 255, 255, .3), inset 0px 0px 25px rgba(0, 150, 200, 1), 0px 2px 10px rgba(0, 0, 0, 0.8);
+				background: -webkit-linear-gradient(top, #076499 10%, #19b3ec);
+			}			
+			#ribbon::before,
+			#ribbon::after {
+				position: absolute;
+				color: #045584;
+				font-size: 12px;
+				line-height: 20px;
+				top: 5px;
+				height: 0;
+				width: 18px;
+				bottom: -.5em;
+				border: 15px solid #179ccd;
+				z-index: -1;
+			}			
+			#ribbon::before {
+				content: '\25E5';
+				text-align: right;
+				left: -21px;
+				border-right-width: 0;
+				border-left-color: transparent;
+				text-indent: 10px;
+			}			
+			#ribbon::after {
+				content: '\25E4';
+				right: -21px;
+				border-left-width: 0;
+				text-indent: -10px;
+				border-right-color: transparent;
+			}						
+			.smallBar {
+				position: relative;
+				width: 100%;
+				height: 36px;
+				margin-top: -60vw;
+				padding: 0;
+				color: var(--app-primary-color);	
+		        box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.2);
+			}
+			#firstBar {
+				position: absolute;
+				top: 0;
+				width: 100%;
+				height: 36px;
+				display: flex;
+				flex-flow: row nowrap;
+				justify-content: space-between;
+				align-items: center;
+				box-shadow: inset 0 0 .5rem rgba(0,0,0,.15);
+			}				
+			paper-icon-button {
+				height: 2.25rem;
+				width: 2.25rem;
+				top: 0;
+				margin: 0;	
+				margin-left: .25rem;
+			}	
+			#sprachwahl {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 36px;
+				margin: .25rem .25rem 0 2.5rem;
+			}
+			#sprachwahl > #svg1 {
+				display: none;
+			}		
+			#sprachwahl > p {
+				position: relative;
+				display: inline-block;
+				font: 500 .7rem/1 sans-serif;
+				color: #19b3ec;	
+				top: -.15rem;
+				margin-left: -.2rem;
+			}
+			#sprachwahl > #svg2 {
+				position: relative;
+				height: .7rem;
+				width: .7rem;
+				margin-left: -.3rem;
+				top: -.05rem;
+			} 
+			#dropdown {
+				fill: #aab;
+			}
+			#sprachwahl:hover #dropdown {
+				fill: #19b3ec;
+			}
+			.dropdown-lang {
+				display: none;
+				position: absolute;
+				top: 36px;
+				right: 0;
+				margin: -.2rem -.25rem 0 0;
+				min-width: 25%;				
+				background-color: rgba(0,0,0,.85);
+				border-bottom: 2px solid var(--app-secondary-color);
+			}
+			#sprachwahl:hover .dropdown-lang {
+				display: block;
+			}
+			.dropdown-lang ul {
+				display: flex;
+				height: 36px;
+				justify-content: center;
+				align-items: center;
+				cursor: pointer;
+			}
+			.dropdown-lang li{
+				font-size: 1rem;
+				padding: 1rem;
+				line-height: 2;
+			}		
+			#title {
+				position: absolute;
+				top: 0;
+				left: calc(50vw - 62px + .25rem);
+			}
+			#firstBar h2 {
+				display: inline;			
+				font-size: .75rem;
+				font-family: 'Cormorant', serif;
+				text-transform: uppercase;
+				background-image: -webkit-linear-gradient(90deg, var(--app-primary-color) 20%,  aqua 40%, var(--app-primary-color) 60%, aqua 80%);
+				-webkit-background-clip: text;
+				background-clip: text;
+				-webkit-text-fill-color: transparent;
+			}
+			#firstBar h2 > span {
+				font-size: .85rem;			
+			}
+			[condensed-title] img {		
+				position: relative;		
+				height: 1.5rem;
+				width: 1.5rem;
+				margin: .45rem -.2rem -.45rem -.1rem;
+				transform: rotate(-5deg);
+			}
+			#logoImage{
+				display: none;
+			}
+			#firstBar > a {
+				display: none;
+			}
+			#suchLupe {				
+				height: 36px;
+				width: 36px;
+				display: flex;
+				background-color: var(--app-primary-color);
+				cursor: pointer;
+			}
+			#lupe {
+				position: relative;
+				width: .85rem;
+				height: .85rem;
+				margin: auto;
+			}
+			#secondBar {
+				display: none;
+			}						
+			app-drawer {
+				--app-drawer-scrim-background: -webkit-linear-gradient(125deg, rgba(13,93,163,.94) 5%, rgba(115,191,58,.94) 75%);
+				--app-drawer-content-container: {
+					width: 100vw;
+				};
+			}	
+			.drawer-contents {
+				height: 100%;
+				overflow-y: auto;
+				box-sizing: border-box;
+			}
+			.chance-container {
+				position: relative;
+				height: 125px;
+				width: 125px;
+				margin: 30px auto 5px auto;		
+			}			
+			.chance-container .image {
+				background-image: url('../images/chancy.png');
+				background-size: contain;
+				border-radius: 50%;
+				border: 3px solid var(--app-primary-color);
+				height: 100%;
+				width: 100%;
+			}			
+			.contact-info {
+				margin: 0 20px;
+				height: 115px;
+				text-align: center;
+			}			
+			.contact-info h2 {
+				font-size: 24px;
+				font-family: 'Cormorant', serif;
+				text-transform: uppercase;
+				margin: 0 auto;
+				background: -webkit-linear-gradient(var(--app-primary-color), var(--app-secondary-color));
+				-webkit-background-clip: text;
+				background-clip: text;
+				-webkit-text-fill-color: transparent;
+			}			
+			h2 .initial-letter {
+				font-size: 32px;
+			}			
+			hr {
+				width: 200px;
+				margin-top: -4px;				
+			}			
+			.contact-info h3 {
+				margin: 15px auto 35px auto;
+				font-size: 13px;
+				font-weight: 100;
+				line-height: 1.3em;
+				color: var(--app-secondary-color);
+				max-width: 220px;
+			}			
+			.drwrbtm {
+				width: 100%;
+				height: 100%;
+				min-height: 1225px;
+				background-color: var(--app-secondary-color);
+				background-image: linear-gradient(90deg, transparent 50%, rgba(255,255,255,.4) 50%);
+				background-size: 75px 75px;
+				padding: 2.25rem 0 1.5rem 0;
+				color: #fff;
+				text-align: center;
+				font: 500 1.25rem/2 sans-serif;
+			}	
+			.line [type=radio] {
+				display: none;
+			}
+			.line [type=radio]:checked ~ label, .line [type=radio]:checked ~ label ~ .content {
+				display: block;				
+				width: calc(8 * 37.5px);		
+				margin-left: calc(50% - 4*37.5px);
+				background: linear-gradient(to top, var(--app-secondary-color), rgba(7,100,153,.75));
+				box-shadow: 1px 1px 10px #054c75, -1px -1px 10px #054c75, 0 -3px 0 -10px #6aa2c2;
+			}
+			.line [type=radio]:checked ~ label {
+				border-bottom: 3px solid #def;
+			}
+			.line [type=radio]:checked ~ label ~ .content {
+				background: linear-gradient(180deg, rgba(7,100,153,.85), rgba(106,162,194,.85));
+				margin-bottom: 1.5rem;
+			}
+			.line [type=radio]:checked ~ label ~ .content > li:first-of-type {
+				padding-top: 1.75rem;
+			}
+			.line [type=radio]:checked ~ label ~ .content > li:last-of-type {
+				border-bottom: 3px solid #def;
+				padding-bottom: 1.25rem;
+			}
+			.content {
+				display: none;			
+			}		
+			.content > * {
+				padding: .75rem 0;
+			}
+			.line > label {
+				line-height: 3.5rem;
+				outline: none;
+			}
+			.line > label:hover, .line > label:focus, .line > label > a:focus, .line > label > a:hover {
+				text-shadow: 0 0 1px #fff, 0 0 1rem #054c75;
+				outline: none;
+			}
+			.content > li {
+				line-height: 1.5;
+			}
+			.content > li > div {
+				outline: none;				
+			}
+			.content > li > div.blue {
+				color: #00e2ff;
+			}
+			.content > li > div.blue:hover {
+				text-shadow: none;
+			}
+			.drwrbtm li, .drwrbtm a {
+				display: block;
+				text-decoration: none;
+			}		
+			.content > li > ul {
+				display: none;
+			}
+			.content > li > a:focus, .content > li > a:hover {
+				color: var(--app-primary-color);
+			}
+			.content > li > ul.active {
+				display: block;
+				background: linear-gradient(to bottom, rgba(7,100,153,.5), transparent, rgba(7,100,153,.5));
+			}
+			.content > li:last-of-type > ul {
+				position: relative;
+				margin-bottom: -1.25rem;
+			}
+			.content > li > ul.active > li {
+				padding: .5rem 0;
+				color: #fff;
+			}
+			.content > li > ul > li:first-of-type {
+				padding-top: 1rem;
+				margin-top: .5rem;
+			}
+			.content > li > ul > li:last-of-type {
+				padding-bottom: 1rem;
+			}
+			.content > li > div:hover, content > li > div:focus {
+				color: #00e2ff;
+			}
+			.content > li > ul > li:hover{
+				color: var(--app-primary-color);
+			}
+			.content > li > ul > li:focus{
+				color: #fff;
+			}
+			section > h2 {
+				margin: 4.5rem auto 1rem auto;
+				text-align: center;
+				font: 300 10vw/1 'Caveat', cursive;
+			}	
+			#themes {
+				margin: 0 0 1rem;
+				width: 100%;
+			}	
+			#themes img {
+				position: relative;
+				margin: .5rem 0;
+				width: 100vw;
+			}
+			.textImgContainer {
+				position: relative;
+			}
+			.textContainer {
+				position: absolute;
+				height: 100%;
+				width: 100%;
+				top: 0;
+				left: 0;
+				text-align: center;
+				z-index: 1;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;				
+			}
+			.textContainer h2 {
+				font: 300 1.5rem/1 sans-serif;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+				color: #fff;
+				text-shadow: 0 0 1px #000;
+			}
+			#reiterhof {
+				display: none;
+			}
+			#gastgeber .textContainer{
+				background: linear-gradient(180deg, rgba(0,0,0, 0.75), rgba(0,0,0,.75));
+			}
+			#gastgeber .textContainer h2 {
+				font-size: 1.4rem;
+			}
+			#gastgeber .textContainer h3 {
+				margin-top: .75rem;
+				font: 100 1rem/1.3 sans-serif;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+				text-shadow: 0 0 1px #000;
+				color: var(--app-primary-color);
+			}
+			.largeOnly {
+				display: none;
+			}
+			footer {
+				margin-top: 4rem;
+				background: linear-gradient(#fefefe, #fff);
+				box-shadow: inset 0 0 22.5rem #fefefe, 0 -2px 1rem -.125rem #ccc;
+				display: flex;
+				flex-direction: column;
+			}
+			footer section {
+				padding: 2rem 4rem;
+				text-align: center;
+				margin: 0 auto;
+			}
+			footer section:nth-child(2) {
+				margin-top: 1rem;
+				background: linear-gradient(var(--app-secondary-color), #055287);
+				color: #fff;
+				text-align: left;
+				letter-spacing: .25px;
+			}
+			footer > section > h4 {
+				font: 300 4.5rem/1 Caveat;
+				margin: 1.5rem 0 1rem 0;
+			}
+			footer > section > div > h5.name {
+				font: 300 2.5rem/1.75 Cormorant;
+				color: var(--app-secondary-color);
+				background: -webkit-linear-gradient(var(--app-secondary-color), var(--app-primary-color) 75%);
+    			-webkit-background-clip: text;
+				background-clip: text;
+    			-webkit-text-fill-color: transparent;
+			}		
+			footer > section > div > div {
+				display: flex;
+				flex-flow: column;
+				justify-content: center;
+				align-items: center;				
+				margin: .75rem auto;
+			}		
+			footer > section > div > div > div:nth-child(1) {
+				margin-bottom: .5rem;
+			}
+			footer > section:nth-child(1) p, footer > section:nth-child(1) span, footer > section:nth-child(1) h5 {
+				margin: 0;
+				font-size: 1rem;
+				color: #222245;
+			}
+
+			@media (min-width: 320px) {
+				[main-title] img {
+					margin-right: 1rem;
+					margin-left: 1rem;
+				}
+				#title {
+					top: .125rem;
+					left: calc(50vw - 75.25px);
+				}
+				#firstBar h2 {
+					font-size: 1rem;
+				}	
+				#firstBar h2 > span {
+					font-size: 1.15rem;			
+				}
+				[condensed-title] img {		
+					height: 1.5rem;
+					width: 1.5rem;
+					margin: .35rem -.25rem -.35rem -.1rem;
+				}
+				#suchLupe {			
+					width: 3.5rem;
+				}
+				#lupe {
+					width: 1.15rem;
+					height: 1.15rem;
+				}
+				#gastgeber .textContainer h2 {
+					font-size: 1.5rem;
+				}
+			}
+			
+			@media (min-width: 360px) {
+				[main-title] img {
+					margin-right: 1.75rem;
+					margin-left: 1.75rem;
+				}
+				form#schnellsuche {
+					width: 50vw;
+				}
+				#themes img {
+					margin: .75rem 0;
+				}
+				.textContainer h2, #gastgeber .textContainer h2 {
+					font-size: 1.75rem;
+					letter-spacing: 1.5px;
+				}
+				#gastgeber .textContainer h3 {
+					font-size: 1.2rem;
+				}
+			}
+			@media (min-width: 480px) {		
+				app-drawer {
+					--app-drawer-content-container: {
+					width: 400px;
+					};
+				}			
+				[main-title] h1 {					
+					margin-top: 37vw;
+				}			
+				#wrapperHdrBtm {
+					margin-top: 5vw;
+				}
+				#ribbon {
+					margin: -4.5vw auto 0 auto;
+				}
+				#themes img {
+					margin: 1rem 0;
+				}
+				.textContainer h2, #gastgeber .textContainer h2 {
+					font-size: 2rem;
+					letter-spacing: 1px;
+				}
+				#gastgeber .textContainer h3 {
+					font-size: 1.4rem;
+				}
+			}
+
+			@media (min-width: 568px) {
+				app-header {
+					height: 52.5vw;
+				}
+				.tallBar {
+					height: 52.5vw;
+				}
+				.tallBar > paper-icon-button {
+					margin-top: 1.25rem;
+				}
+				#bar {	
+					height: 2.5rem;
+					margin: 2.65vw 0 0 0;	
+					width: 45%;
+					left: calc(100vw - 45vw - 1.5rem);
+					display: flex;
+					justify-content: space-between;
+					border-radius: 3px;				
+					border-color: #fff;
+					box-shadow: inset 0 0 .3rem #fff, 0 0 .25rem #aaa;
+				}
+				form#schnellsuche {
+					position: absolute;
+					height: 2.5rem;
+					width: calc(45vw - 4rem);
+					background-color: rgba(255,255,255,.3);		
+					border-color: #ccc;
+					border-radius: 5px;
+				}
+				paper-input {			
+					margin-top: 0;
+					font-weight: 100;
+					--paper-input-container: {
+						line-height: .9;
+						padding: 0;
+						margin: 0;
+					};
+					--paper-input-container-label: {
+						margin-top: -.65rem;
+						font-size: 1.125rem;
+						font-weight: 500;
+						letter-spacing: .3px;
+						text-align: center;
+						text-shadow: 1px -1px #ccc;
+					};
+					--paper-input-container-label-floating: {
+						margin-top: 0;
+						font-size: .9rem;
+						padding-bottom: 0;		
+						text-shadow: 1px -1px #ccc;
+						color: var(--app-secondary-color); 
+					};
+					--paper-input-container-input: {
+						font-size: 1rem;
+						font-weight: 300;
+						margin-top: -.5rem;
+						letter-spacing: 1px;		
+						color: var(--app-secondary-color);	
+						text-align: center;
+					};
+				}
+				[main-title] img {
+					height: 2.25rem;
+					width: 2.25rem;
+					margin:.175rem 1rem 0 1rem;
+				}
+				[main-title] h1 {					
+					margin-top: 27vw;
+				}			
+				#wrapperHdrBtm {
+					margin-top: 7vw;
+				}
+				.rwdwn::before {
+					border-top: 7vw solid transparent;
+				}		
+				#ribbon {
+					margin: -6.5vw auto 0 auto;
+					left: calc(50vw - 121.1px);
+					padding: 9px 25px 9px 25px;
+					height: 20px;
+					font: 20px/1 'Caveat', cursive;					
+				}
+				#ribbon::before,
+				#ribbon::after {
+					position: absolute;
+					color: #045584;
+					font-size: 17px;
+					line-height: 17px;
+					top: 12px;
+					height: 0;
+					width: 22px;
+					border: 16px solid #179ccd;
+					z-index: -1;
+				}			
+				#ribbon::before {
+					content: '\25E5';
+					text-align: right;
+					left: -22px;
+					border-right-width: 0;
+					border-left-color: transparent;
+					text-indent: 4px;
+				}			
+				#ribbon::after {
+					content: '\25E4';
+					right: -22px;
+					border-left-width: 0;
+					text-indent: -4px;
+					border-right-color: transparent;
+				}		
+				div[condensed-title] {
+					height: 50px;
+				}
+				.smallBar {
+					margin-top: -52.5vw;
+					height: 50px;
+					box-shadow: none;
+				}
+				#firstBar{
+					height: 50px;
+				}
+				paper-icon-button {
+					height: 2rem;
+					width: 2rem;
+					margin-left: 1.5rem; 					
+					border-radius: 50%;
+					border: .5px solid limegreen;
+					background-color: rgba(255,255,255,.05);	
+					color: #ddf;	
+					box-shadow: 0 0 8px 1px var(--app-primary-color), inset 0 0 15px #fff;
+					line-height: .5rem;
+				}
+				#title {
+					margin-top: -.2rem;
+					left: calc(50vw - 103.5px);
+				}
+				#firstBar h2 {	
+					font-size: 1.25rem;
+				}
+				#firstBar h2 > span {
+					font-size: 1.6rem;
+				}
+				[condensed-title] img {		
+					height: 2.3rem;
+					width: 2.3rem;
+					margin: .55rem -.1rem -.55rem 0;
+				}
+				#sprachwahl {
+					height: 50px;
+					margin: .5rem 0 0 4.7rem;
+				}
+				#sprachwahl > #svg1 {
+					display: inline-block;
+					width: 1.35rem;
+					height: 1.35rem;
+				}
+				#sprachwahl > #svg2 {
+					top: 0;
+					margin-left: -.2rem;
+					height: 1rem;
+					width: 1rem;
+				}
+				#sprachwahl > p {
+					font-size: 1rem;
+					font-weight: 500;
+					margin-left: 0;
+				}	
+				.dropdown-lang {
+					top: 50px;
+					margin-top: -.5rem;
+					border-bottom: .25rem solid var(--app-secondary-color);
+				}	
+				.dropdown-lang ul {
+					height: 50px;
+				}
+				.dropdown-lang li{					
+					font-size: 1.15rem;
+				}	
+				#suchLupe {				
+					height: 50px;
+					width: 5rem;
+				}
+				#lupe {
+					width: 1.5rem;
+					height: 1.5rem;
+				}	
+				section > h2 {
+					margin-top: 5rem;
+				}
+				#themes {
+					display: flex;
+					flex-flow: row wrap;
+					margin: 0 0 2rem .5rem;
+					width: calc(100vw - .5rem);
+				}				
+				.textImgContainer {
+					width: calc(50vw - .5rem - 1rem - .25rem);
+					margin: .5rem;		
+				}
+				.textContainer {
+					margin-top: 1rem;
+				}
+				.textContainer h2, #gastgeber .textContainer h2 {
+					font-size: 1.3rem;
+				}
+				#gastgeber .textContainer h3 {
+					font-size: .85rem;
+				}
+				#themes img {
+					width: 100%;		
+					height: 100%;			
+				}						
+				footer > section > div > div {
+					flex-flow: row nowrap;
+					align-items: flex-start;
+					margin: .75rem 0;
+				}	
+				footer > section > div > div > div {
+					text-align: left;
+				}	
+				footer > section > div > div > div:nth-child(1) {
+					margin-right: 2rem;
+					margin-left: 1.5rem;
+				}
+			}
+			@media (min-width: 640px) {
+				#ribbon {
+					margin-top: -6vw;					
+				}
+				.textContainer h2, #gastgeber .textContainer h2 {
+					font-size: 1.5rem;
+				}
+				#gastgeber .textContainer h3 {
+					font-size: 1.05rem;
+				}
+			}
+			@media (min-width: 740px) {
+				#bar {	
+					width: 38%;
+					margin-top: 2.5vw;	
+					left: calc(100vw - 38vw - 2rem);						
+					box-shadow: inset 0 0 .75rem #fff, 0 0 .35rem #aaa;			
+				}
+				form#schnellsuche {
+					width: calc(38vw - 9vw - 2.3rem);
+				}
+				[main-title] img {
+					height: 9vw;
+					width: 9vw;
+					margin: -1.15vw 1.15rem 0;					
+				}
+				#ribbon {
+					margin-top: -5vw;					
+				}
+				app-drawer {
+					--app-drawer-scrim-background: -webkit-linear-gradient(125deg, rgba(13,93,163,.94) 5%, rgba(115,191,58,.94) 75%);
+					--app-drawer-content-container: {
+						width: 45%;
+					};
+				}	
+				#themes {
+					margin: 0 0 3rem .75rem;
+					width: calc(100vw - .75rem);
+				}
+				.textImgContainer {
+					margin: .75rem;
+					width: calc(50vw - .75rem - 1.5rem - .25rem);		
+					height: calc((50vw - 2.25rem) * .75);			
+				}			
+				.textContainer h2, #gastgeber .textContainer h2 {
+					font-size: 1.75rem;
+					letter-spacing: 1.5px;
+				}	
+				#gastgeber .textContainer h3 {
+					font-size: 1.25rem;					
+				}
+				footer section:nth-child(2) {
+					margin-top: 1.75rem;
+				}
+			}
+			@media (min-width: 769px) {
+				#wrapperHdrBtm {
+					margin-top: 7vw;
+				}
+				#ribbon {
+					margin-top: -4vw;					
+				}
+				.textContainer h2 {
+					z-index: 1;
+				}
+				.textContainer::after {
+				    background-image: -webkit-linear-gradient(rgba(0,0,0, 0.6), rgba(0,0,0,.6));
+					content: "";
+					opacity: 0;
+					position: absolute;
+					width: 100%;
+					height: 100%;
+					top: 0;
+					left: 0;
+					transition: opacity .35s ease-in-out;
+				}
+				.textContainer:hover::after {
+					opacity: 1;
+					z-index: 0;
+				}
+				#gastgeber .textContainer:hover::after {
+					opacity: 0;
+				}
+			}
+			@media (min-width: 1024px) {
+				app-header:hover {
+					--app-header-shadow: {
+						display: none;
+					};
+				}
+				.menu-icon[icon] {
+        			display: none;
+      			}
+				#bar {	
+					height: 3.5rem;
+					margin-top: 2.5vw;
+					width: 35%;	
+					left: calc(100vw - 35vw - 2.5rem);
+				}
+				form#schnellsuche {
+					height: 3.5rem;
+					width: calc(35vw - 10.5vw);
+					background-color: rgba(255,255,255,.4);
+				}
+				[main-title] img {
+					height: 8vw;
+					width: 8vw;
+					margin:-1.25vw 1.25vw 0;
+				}
+				paper-input {			
+					height: 3.5rem;
+					font-weight: 100;
+					--paper-input-container: {
+						height: 3.5rem;
+						line-height: 1.6;
+						padding: 0;
+						margin: 0;
+					};
+					--paper-input-container-label: {
+						line-height: .8;
+						padding-bottom: .5rem;
+						font-size: 1.6rem;
+						font-weight: 400;
+						letter-spacing: 1.25px;
+						text-align: center;
+						text-shadow: 1.25px 1.25px 1.25px #779;
+					};
+					--paper-input-container-label-floating: {
+						font-size: 1.2rem;
+						padding-bottom: 0;		
+						text-shadow: 1px -1px #ccc;
+						color: var(--app-secondary-color); 
+					};
+					--paper-input-container-input: {
+						font-size: 1.3rem;
+						font-weight: 300;
+						margin-bottom: 0;
+						padding-left: 1rem;	
+						width: calc(100% - 2rem);
+						padding-bottom: .125rem;
+						letter-spacing: 1px;		
+						color: var(--app-secondary-color);	
+					};
+					--paper-input-container-underline-focus: {
+						height: 3px;
+					};	
+				}
+				#ribbon {
+					margin-top: -4.7vw;
+					left: calc(50vw - 147px);
+					height: 25px;
+					font-size: 25px;
+					padding: 14px 30px 14px 30px;
+				}		
+				#ribbon::before,
+				#ribbon::after {
+					position: absolute;
+					color: #045584;
+					font-size: 22px;
+					line-height: 22px;
+					top: 16px;
+					height: 0;
+					width: 22px;
+					border: 22px solid #179ccd;
+					z-index: -1;
+				}			
+				#ribbon::before {
+					content: '\25E5';
+					text-align: right;
+					left: -24px;
+					border-right-width: 0;
+					border-left-color: transparent;
+					text-indent: 3px;
+				}			
+				#ribbon::after {
+					content: '\25E4';
+					right: -24px;
+					border-left-width: 0;
+					text-indent: -3px;
+					border-right-color: transparent;
+				}		
+				.smallBar {
+					position: relative;
+					margin-top: -750px;
+					width: 100%;
+					height: 140px; 
+					padding: 0;
+				}				
+				#firstBar {				
+					height: 60px;
+				}	
+				#suchLupe {
+					order: 1;
+					height: 60px;
+					width: 6rem;
+					background-color: #16cfde;
+				}
+				#lupe {
+					height: 1.7rem;
+					width: 1.7rem;
+				}
+				#logoImage{
+					display: block;
+					position: relative;
+					width: 7.35rem;
+					height: 7.35rem;
+					top: 2.5rem;
+					left: -1.25rem;
+					border-radius: 50%;
+					border-right: .75rem solid var(--app-primary-color);
+					border-left: .75rem solid var(--app-primary-color);
+					background: radial-gradient(var(--app-secondary-color) 43%, var(--app-primary-color), aqua);
+					order: 3;
+					z-index: 2;
+				}
+				#logoImage img {
+					margin-top: -.4rem;
+					margin-left: .2rem;
+					width: 7.15rem;
+					height: 7.15rem;
+					transform: rotate(.4deg);
+					z-index: 1;
+				}
+				#title {
+					position: relative;
+					left: 0;
+					margin-top: -.75rem;
+					order: 2;
+				}
+				[condensed-title] img {
+					height: 2.4rem;
+					width: 2.4rem;
+					margin: .65rem -1rem -.65rem 0;
+				}
+				#firstBar > span > h2 {	
+					font-size: 1.35rem;
+				}
+				#firstBar > span > h2 > span {
+					font-size: 1.6rem;
+				}
+				[condensed-title] img {		
+					margin-right: 0;
+				}
+				#firstBar > a {				
+					display: inline;
+					margin-right: 2rem;
+					color: #fff;
+					font: 100 1.3rem/1 sans-serif;
+					order: 4;
+				}
+				#sprachwahl {
+					position: relative;
+					width: 9rem;
+					order: 5;
+					height: 60px;
+					margin: 0;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					background-color: var(--app-primary-color);
+				}
+				#sprachwahl > #svg1 {
+					width: 1.75rem;
+					height: 1.75rem;
+				}
+				#sprachwahl > #svg1 * {
+					fill: #fff;
+				}
+				#sprachwahl > p {
+					color: #fff;
+					margin-left: .7rem;
+					font-size: 1.25rem;
+					top: 0;
+				}
+				#sprachwahl > #svg2 {
+					margin-left: .2rem;
+					width: 1.5rem;
+					height: 1.5rem;
+				}
+				#dropdown {
+					fill: #ccd; 
+				}
+				#sprachwahl:hover #dropdown {
+					fill: #fff;
+				}
+				.dropdown-lang {
+					right: initial;
+					left: 0;
+					margin: 0;
+					margin-top: .65rem;
+					width: 9rem;
+				}
+				.dropdown-lang ul {
+					height: 60px;
+				}
+				.dropdown-lang li{
+					font-size: 1.35rem;
+					font-weight: bold;
+					padding: 0 2.7rem;
+					line-height: 4;
+				}
+				#secondBar {
+					display: block;
+					margin-top: 60px;
+					height: 80px;
+					width: 100%;			
+					background-color: #fff;
+				}
+				#headLi {
+					height: 80px;
+					width: 100%;
+					display: flex;
+					justify-content: space-around;
+					font-size: 1.2rem;
+					font-weight: 500;
+					letter-spacing: 1px;
+					text-transform: uppercase;
+					color: var(--app-secondary-color);
+				}	
+				#headLi > span {
+					height: 80px;
+					width: 30vw;
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+				}
+				#headLi > span:first-of-type {
+					margin-right: 5vw;
+				}
+				#headLi > span:last-of-type {
+					margin-left: 7vw;
+				}
+				#headLi > span > li:hover {
+					color: var(--app-primary-color);
+				}
+				#europaList, #weltList {
+					position: absolute;
+					width: 1.5rem;
+					height: 1.5rem;
+				}
+				#headLi > span > li:nth-of-type(2):hover > div {
+					display: block;
+				}
+				#listEU, #listWelt {
+					display: none;
+					position: absolute;
+					color: #fff;
+					margin-top: 26px;
+					width: 450px;
+				}
+				#listWelt {
+					width: 400px;
+				}
+				#listEU > ul > li, #listWelt > ul > li {
+					display: block;
+					padding: 1rem 0;
+					padding-bottom: .25rem;
+					border-bottom: 2px solid var(--app-secondary-color);
+					background: rgba(0,0,0,.85);
+				}
+				#listEU > ul > li:hover, #listWelt > ul > li:hover {
+					background: #fff;
+					color: var(--app-primary-color);
+				}
+				#listEU > ul > li:hover > span > ul > li, #listWelt > ul > li:hover > span > ul > li {
+					color: #000;
+				}
+				#listEU > ul > li:nth-of-type(10), #listWelt > ul > li:nth-of-type(6) {
+					margin-bottom: 0;
+					border-bottom: 4px solid var(--app-secondary-color);
+				}
+				#listEU > ul > li:last-of-type, #listWelt > ul > li:last-of-type {
+					background: none;
+					border: none;
+					height: 11rem;
+				}
+				#listEU > ul > li > a, #listEU > ul > li > span, #listWelt > ul > li > a, #listWelt > ul > li > span {
+					padding: 0 5rem 0 1.5rem;
+				}
+				#listEU > ul > li > span > ul, #listWelt > ul > li > span > ul {
+					display: none;
+				}
+				#listEU > ul > li.ul > span > div:hover ~ ul, #listEU > ul > li.ul > span > ul:hover, #listWelt > ul > li.ul > span > div:hover ~ ul,  #listWelt > ul > li.ul > span > ul:hover {
+					display: block;
+				}
+				#listEU > ul > li.ul > span > div, #listWelt > ul > li.ul > span > div {
+					position: absolute;
+					left: calc(100% - 3rem);
+					margin-top: -2.25rem;
+					margin-bottom: -2.25rem;
+					font-size: 3rem;
+					color: var(--app-primary-color);
+					padding: 0 .75rem .25rem .25rem;
+				}
+				#listEU > ul > li > span > ul > li, #listWelt > ul > li > span > ul > li {
+					display: block;
+					padding: .75rem 2rem 0 3.5rem;
+				}
+				#listEU > ul > li > span > ul > li:hover, #listWelt > ul > li > span > ul > li:hover {
+					color: var(--app-primary-color)
+				}
+				#dropLi{
+					display: none;	
+					height: 24rem;
+					width: 100%;
+					position: relative;
+					overflow: hidden;
+					z-index: 1;		
+					background-color: #fff;	
+    				box-shadow: 0px 8px 8px 0px rgba(0,0,0,0.2);
+				}
+				#dropLi > input {
+					display: none;
+				}
+				#dropLi > #span-one:checked ~ ul > span:nth-of-type(1) {
+					margin-left: 0;
+				}
+				#dropLi > #span-two:checked ~ ul > span:nth-of-type(1) {
+					margin-left: -100vw;
+				}
+				#dropLi > #span-three:checked ~ ul > span:nth-of-type(1) {
+					margin-left: -200vw;
+				}
+				#dropLi > div {
+					position: absolute;
+					height: 100%;
+				}
+				#dropLi > div > label {
+					display: none;			
+					position: relative;		
+					color: lightgrey;
+					font-size: 8rem;
+					padding: 7rem 0 3rem 0;
+				}
+				#dropLi > div > label:hover {
+					color: lightblue;
+				}
+				#dropLi > div.left {
+					left: 2rem;
+				}
+				#dropLi > div.right {
+					left: calc(100% - 5rem);
+				}
+				#span-one:checked ~ div > label:nth-of-type(1),
+				#span-one:checked ~ div > label:nth-of-type(4),
+				#span-two:checked ~ div > label:nth-of-type(2),
+				#span-two:checked ~ div > label:nth-of-type(5),
+				#span-three:checked ~ div > label:nth-of-type(3),
+				#span-three:checked ~ div > label:nth-of-type(6)
+				 {
+					display: block;
+				}
+ 				#dropLiUl {	
+					width: 3072px;
+					margin-left: 37px;
+					display: flex;
+					flex-flow: row nowrap;
+				}
+				#dropLiUl > span {
+					height: 23rem;
+					margin-bottom: 1rem;
+					width: calc(1024px - 148px);
+					position: relative;
+					display: flex;	
+					flex-flow: row nowrap;
+					justify-content: space-around;
+					transition: all 0.7s cubic-bezier(0.4, 1.3, 0.7, 1);	
+				}
+				#dropLiUl > span:nth-of-type(1) {
+					left: 37px;
+				}
+				#dropLiUl > span:nth-of-type(2) {
+					left: calc(148px + 37px);
+				}
+				#dropLiUl > span:nth-of-type(3) {
+					left: calc(2*148px + 37px);
+				}
+				#dropLiUl span > li {
+					display: flex;
+					flex-direction: column;
+					justify-content: flex-end;
+					align-items: center;
+					font-size: 1.3rem;
+					margin-bottom: 1rem;
+				}
+				#mcPm {
+					font-size: 1.2rem;
+				}
+				#dropLiUl li > * {
+					line-height: 1.35;	
+					font-weight: 300;
+				}
+				#dropLiUl li >  h4 span {
+					display: block;
+					text-align: center;
+					font-size: 1.15rem;
+				}
+				#dropLiUl a {
+					width: 200px;
+					height: 200px;
+					border-radius: 50%;
+					border: .5rem double var(--app-primary-color);
+					overflow: hidden;
+					position: relative;
+				}
+				#dropLiUl img {
+					transform: none;
+					margin: auto;
+					width: auto;
+					height: 100%;
+				}
+				#themes {
+					margin: 3rem 0 2rem 1rem;
+					width: calc(100vw - 1rem);
+				}
+				.textImgContainer {
+					margin: 1rem;
+					width: calc(50vw - 1rem - 2rem);		
+					height: calc((50vw - 3rem) * .75);
+				}					
+				.textContainer h2, #gastgeber .textContainer h2 {
+					font-size: 2.25rem;					
+					font-weight: 500;
+					letter-spacing: 2px;
+					text-shadow: 0 1px 2px #000;
+				}	
+				#gastgeber .textContainer h3 {
+					font-size: 1.6rem;
+				}
+				footer section:nth-child(2) {
+					margin-top: 2rem;
+				}
+				footer > section > div > div > div:nth-child(1) {
+					margin-right: 4rem;
+					margin-left: 2rem;
+				}
+			}
+			@media (min-width: 1025px) {		
+				.largeOnly {
+					display: block;
+				}		
+				paper-input {
+					--paper-input-container: {
+						height: 3.5rem;
+						line-height: 1.7;
+						padding: 0;
+						margin: 0;
+					};
+					--paper-input-container-underline-focus: {
+						height: 4px;
+					};		
+				}
+				#logoImage{
+					width: 8.5rem;
+					height: 8.5rem;
+					top: 2.6rem;
+					left: -.25rem;
+				}
+				#logoImage img {
+					margin-top: -.2rem;
+					margin-left: 0;
+					width: 8.75rem;
+					height: 8.75rem;
+				}
+				#dropLi{
+					height: 23rem;
+				}
+				#dropLi > div > label {
+					padding: 6.5rem 0;
+				}
+				#dropLiUl {	
+					width: 300%;
+				}
+				#dropLiUl > span {
+					height: 22rem;
+					width: calc(33.33% - 148px);
+				}
+				#dropLiUl > span:nth-of-type(1) {
+					left: 37px;
+				}
+				#dropLiUl > span:nth-of-type(2) {
+					left: calc(148px + 55px);
+				}
+				#dropLiUl > span:nth-of-type(3) {
+					left: calc(2*148px + 74px);
+				}
+				section > h2 {
+					margin: 8rem 0 2rem 0;
+				}
+				#themes {
+					margin: 0 1rem 2rem 1rem;
+					width: calc(100vw - 2rem);
+				}	
+				#regionen {
+					padding-bottom: 3rem;
+				}
+				#regioList {
+					display: flex;
+					flex-flow: row wrap;
+					margin: 1rem;
+					width: calc(100% - 2rem);
+				}	
+				#regionen .textImgContainer {
+					margin: 1rem;
+				}				
+				#regionen .textContainer {
+					margin-top: 0;
+				}		
+				#regionen img {
+					width: 100%;
+					height: 100%;
+				}		
+				.full {
+					position: relative;
+					width: calc(100vw - 4rem);
+					height: calc((100vw - 4rem) * 0.195084485);
+					margin-top: 3rem;
+				}
+				.twothird {
+					width: calc(66vw - 3.25em);
+					height: auto;
+				}
+				.onethird {
+					width: calc(33vw - 3.25rem);
+					height: auto;
+				}
+				.textContainer h2.panoh2 {
+					font-size: 4.5rem;
+					letter-spacing: 5px;
+				}
+				.textContainer h2.largeh2 {
+					font-size: 3.25rem;
+					letter-spacing: 5px;
+				}
+				.textContainer h2.smallh2 {
+					font-size: 2rem;
+					line-height: 1.5;
+					letter-spacing: 5px;
+				}	
+				footer > section > h4 {
+					margin-bottom: 1.5rem;
+				}
+			}
+			@media (min-width: 1025px) and (max-height: 800px) {
+				app-header, .tallBar {
+					height: 575px;
+				}
+				app-header {
+					--app-header-background-front-layer: {
+						background-image: url(../images/travel-lr.jpg);
+						background-position: left 35%;
+						background-repeat: no-repeat;
+						background-color: #fff;
+						-webkit-backdrop-filter: saturate(150%);
+						backdrop-filter: saturate(150%);
+						z-index: -1;
+					};			
+				}
+				[main-title] h1 {
+					font-size: 125px;
+					margin-top: 300px;
+				}
+				#wrapperHdrBtm {
+					margin-top: 50px;
+				}
+				#ribbon {
+					margin-top: -51px;
+					}
+				.smallBar {
+					margin-top: -575px;
+				}
+			}
+			@media (min-width: 1230px) {
+				#gastgeber .textContainer h2 {
+					font-size: 2.5rem;
+				}
+				#gastgeber .textContainer h3 {
+					font-size: 1.8rem;
+				}
+			}
+			@media (min-width: 1366px) {
+				#wrapper {
+					width: 1366px;
+					min-height: 100vh;
+					margin: 0 auto;
+					box-shadow: 0 0 38px rgba(0,0,0,0.30), 0 0 12px rgba(0,0,0,0.22);
+				}								
+				app-header, .tallBar,.rwdwn  {
+					width: 1366px;
+					margin: 0 auto;
+				}	
+				app-header, .tallBar {
+					height: 750px;			
+				}
+				#bar {				
+					width: 470px;	
+					left: calc(1366px - 470px - 2rem);
+				}
+				form#schnellsuche {
+					width: 327px;
+				}
+				[main-title] img {
+					height: 109px;
+					width: 109px;
+					margin:-17px 17px 0;
+				}
+				[main-title] h1 {
+					font-size: 135px;
+					margin-top: 366px;
+				}
+				#wrapperHdrBtm {
+					margin-top: 124px;
+				}
+				.rwdwn::before {
+					border-left: 683px solid #fff;
+					border-right: 684px solid #fff;
+					border-top: 95px solid transparent;
+				}			
+				#ribbon {
+					margin-top: -50px;
+					left: calc(683px - 125px);
+				}	
+				#firstBar > span > h2 {
+					font-size: 1.5rem;
+				}
+				#firstBar > span > h2 > span {
+					font-size: 1.9rem;
+				}
+				#headLi > span {
+					width: 341.5px;
+				}
+				#headLi > span:first-of-type {
+					margin-right: 68.3px;
+				}
+				#headLi > span:last-of-type {
+					margin-left: 68.3px;
+				}
+				section > h2 {
+					font-size: 130px;
+					margin-bottom: 3rem;
+				}
+				#dropLi > #span-two:checked ~ ul > span:nth-of-type(1) {
+					margin-left: calc(-1366px);
+				}
+				#dropLi > #span-three:checked ~ ul > span:nth-of-type(1) {
+					margin-left: calc(-2732px);
+				}
+				#dropLiUl {	
+					width: 4098px;
+				}
+				#dropLiUl > span {
+					width: calc(1366px - 148px);	
+				}
+				#dropLiUl > span:nth-of-type(2) {
+					left: calc(148px + 37px);
+				}
+				#dropLiUl > span:nth-of-type(3) {
+					left: calc(2*148px + 37px);
+				}
+				#strand {
+					order: 1;
+				}
+				#stadt {
+					order: 3;
+					margin-top: calc(-309.5px - 1rem);
+				}
+				#hund {
+					order: 2;
+				}
+				#ski {
+					order: 4;
+					margin-left: calc(-412.67px - 1rem);
+				}
+				#wandern {
+					order: 5
+				}
+				#bauernhof {
+					order: 6
+				}
+				#gastgeber {
+					order: 7;				
+				}				
+				#gastgeber .textContainer h2 {
+					font-size: 1.9rem;
+				}			
+				#gastgeber .textContainer h3 {
+					font-size: 1.4rem;
+				}
+				#kultur {
+					order: 8;
+					margin-top: calc(-309.5px - 1rem);
+				}
+				#reiterhof {
+					display: block;
+					order: 9;
+					margin-top: calc(-309.5px - 1rem);
+					margin-left: calc(825.32px + 5rem);
+				}
+				#themes {				
+					width: calc(1366px - 2rem);
+				}	
+				.textImgContainer {
+					margin: 1rem;
+					width: calc(((1366px - 2rem) / 3) - 2rem);
+					height: calc((((1366px - 2rem) / 3) - 2rem) * .75);
+				}	
+				.textContainer h2.bigImgh2 {
+					font-size: 3.5rem;
+					letter-spacing: 3px;
+				}
+				#themes .bigImgLeft, #themes .bigImgRight, #themes .bigImgText, #themes .bigImgLeft img, #themes .bigImgRight img {
+					height: 659px;
+					width: 857.33px;
+				}
+				.smallImgText h2{
+					font-size: 2rem;
+				}
+				.full {
+					position: relative;
+					width: calc(1366px - 4rem);
+					height: calc((1366px - 4rem) * 0.195084485);
+					margin-top: 3rem;
+				}
+				.twothird {
+					width: calc(910.66px - 3.25rem);
+					height: auto;
+				}
+				.onethird {
+					width: calc(455.33px - 3.25rem);
+					height: auto;
+				}
+			}
+			@media (min-width: 1366px) and (max-height: 768px) {
+				app-header, .tallBar {
+					height: 575px;
+				}
+				app-header {
+					--app-header-background-front-layer: {
+						background-image: url(../images/travel-lr.jpg);
+						background-position: left 35%;
+						background-repeat: no-repeat;
+						background-color: #fff;
+						-webkit-backdrop-filter: saturate(150%);
+						backdrop-filter: saturate(150%);
+						z-index: -1;
+					};			
+				}
+				[main-title] h1 {
+					font-size: 125px;
+					margin-top: 250px;
+				}
+				#wrapperHdrBtm {
+					margin-top: 85px;
+				}
+				.smallBar {
+					margin-top: -575px;
+				}
+			}
+
+		</style>
+
+		<iron-media-query query="max-width: 1024px" query-matches="{{smallScreen}}"></iron-media-query>
+		<app-drawer-layout drawer-width="300px" fullbleed="" force-narrow="">		
+			<app-drawer swipe-open="" opened="false">
+				<div class="drawer-contents">
+				  <template is="dom-if" if="[[smallScreen]]">				
+					<div class="chance-container">
+						<div class="image"></div>
+					</div>
+					<div class="contact-info">
+						<h2 class="name"><span class="initial-letter">G</span>astgeber<span class="initial-letter">N</span>et</h2>
+						<hr>
+						<h3 class="intro">Verzeichnis für Ferienwohnungen und Ferienhäuser weltweit</h3>
+					</div>
+					<div class="drwrbtm">
+						<nav>
+							<ul>	
+								<li class="line">
+									<input type="radio" id="select-deutschland" name="selector">
+									<label for="select-deutschland" tabindex="0">Deutschland</label>
+									<ul class="content">
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=15">Schleswig-Holstein</a>
+										</li>
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=2">Bayern</a>
+										</li>
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=1">Niedersachsen</a>
+										</li>
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=8">Brandenburg &amp; Mecklenburg-Vorpommern</a>
+										</li>	
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=1">Baden-Württemberg</a>
+										</li>
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=3">Hamburg &amp; Berlin</a>
+										</li>
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=11">Hessen, Rheinland-Pfalz &amp; Saarland</a>
+										</li>
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=10">Nordrhein-Westfalen</a>
+										</li>
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=13">Sachsen, Sachsen-Anhalt &amp; Thüringen</a>
+										</li>
+									</ul>
+								</li>
+								<li class="line">
+									<input type="radio" id="select-europa" name="selector">
+									<label for="select-europa" tabindex="0">Europa</label>
+									<ul class="content">
+										<li><div on-tap="openSub" tabindex="23">Benelux</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Belgien">Belgien</a></li>
+												<li><a href="http://www.gastgeber.net/Niederlande">Niederlande</a></li>
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="16">Alpen</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Oesterreich">Österreich</a></li>
+												<li><a href="http://www.gastgeber.net/Schweiz">Schweiz</a></li>
+												<li><a href="http://www.gastgeber.net/Slowenien">Slowenien</a></li>
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="19">Britische Inseln</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/England">England</a></li>
+												<li><a href="http://www.gastgeber.net/Schottland">Schottland</a></li>
+												<li><a href="http://www.gastgeber.net/Wales">Wales</a></li>
+												<li><a href="http://www.gastgeber.net/Nordirland">Nordirland</a></li>
+												<li><a href="http://www.gastgeber.net/Irland">Irland</a></li>
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="18">Skandinavien &amp; Island</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Norwegen">Norwegen</a></li>
+												<li><a href="http://www.gastgeber.net/Schweden">Schweden</a></li>
+												<li><a href="http://www.gastgeber.net/Daenemark">Dänemark</a></li>
+												<li><a href="http://www.gastgeber.net/Island">Island</a></li>
+											</ul>
+										</li>
+										<li><a href="http://gastgeber.net/Frankreich" tabindex="24">Frankreich</a></li>
+										<li><a href="http://gastgeber.net/Italien" tabindex="25">Italien</a></li>
+										<li><div on-tap="openSub" tabindex="17">Westliches Mittelmeer</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Spanien">Spanien</a></li>
+												<li><a href="http://www.gastgeber.net/Portugal">Portugal</a></li>
+												<li><a href="http://www.gastgeber.net/Malta">Malta</a></li>			
+											</ul>
+										</li>	
+										<li><div on-tap="openSub" tabindex="21">Östliches Mittelmeer</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Griechenland">Griechenland</a></li>
+												<li><a href="http://www.gastgeber.net/Kroatien">Kroatien</a></li>
+												<li><a href="http://www.gastgeber.net/Tuerkei">Türkei</a></li>
+												<li><a href="http://www.gastgeber.net/Zypern">Zypern</a></li>
+											</ul>											
+										</li>
+										<li><div on-tap="openSub" tabindex="20">Ost- &amp; Südosteuropa</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Tschechien">Tschechien</a></li>
+												<li><a href="http://www.gastgeber.net/Ungarn">Ungarn</a></li>
+												<li><a href="http://www.gastgeber.net/Bulgarien">Bulgarien</a></li>
+												<li><a href="http://www.gastgeber.net/Mazedonen">Mazedonen</a></li>
+												<li><a href="http://www.gastgeber.net/Ukraine">Ukraine</a></li>
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="22">Nordosteuropa</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Polen">Polen</a></li>
+												<li><a href="http://www.gastgeber.net/Estland">Estland</a></li>
+												<li><a href="http://www.gastgeber.net/Lettland">Lettland</a></li>
+												<li><a href="http://www.gastgeber.net/Litauen">Litauen</a></li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+								<li class="line">
+									<input type="radio" id="select-weltweit" name="selector">
+									<label for="select-weltweit" tabindex="0">weltweit</label>
+									<ul class="content">
+										<li><div on-tap="openSub" tabindex="25">Asien</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/China">China</a></li>
+												<li><a href="http://www.gastgeber.net/Indien">Indien</a></li>
+												<li><a href="http://www.gastgeber.net/Indonesien">Indonesien</a></li>
+												<li><a href="http://www.gastgeber.net/Kambodscha">Kambodscha</a></li>
+												<li><a href="http://www.gastgeber.net/Malaysien">Malaysien</a></li>
+												<li><a href="http://www.gastgeber.net/Philippinen">Philippinen</a></li>
+												<li><a href="http://www.gastgeber.net/Russland">Russland</a></li>
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="26">Ozeanien</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Australien">Australien</a></li>
+												<li><a href="http://www.gastgeber.net/Neuseeland">Neuseeland</a></li>
+												<li><a href="http://www.gastgeber.net/Sued-Pazifik">Süd-Pazifik</a></li>			
+											</ul>
+										</li>	
+										<li><div on-tap="openSub" tabindex="27">Afrika</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Aegypten">Ägypten</a></li>
+												<li><a href="http://www.gastgeber.net/Kenia">Kenia</a></li>
+												<li><a href="http://www.gastgeber.net/Suedafrika">Südafrika</a></li>
+												<li><a href="http://www.gastgeber.net/Marokko">Marokko</a></li>
+												<li><a href="http://www.gastgeber.net/Namibia">Namibia</a></li>
+												<li><a href="http://www.gastgeber.net/Simbabwe">Simbabwe</a></li>		
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="28">Mittel- &amp; Südamerika</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Brasilien">Brasilien</a></li>
+												<li><a href="http://www.gastgeber.net/Argentinien">Argentinien</a></li>
+												<li><a href="http://www.gastgeber.net/Costa_Rica">Costa Rica</a></li>
+												<li><a href="http://www.gastgeber.net/Karibik">Karibik</a></li>
+												<li><a href="http://www.gastgeber.net/Paraguay">Paraguay</a></li>
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="29">Nordamerika</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/USA">USA</a></li>
+												<li><a href="http://www.gastgeber.net/Kanada">Kanada</a></li>		
+												<li><a href="http://www.gastgeber.net/Mexico">Mexiko</a></li>
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="30">Mittlerer Osten</div>								
+											<ul>
+												<li><a href="http://www.gastgeber.net/Israel">Israel</a></li>
+											</ul>
+										</li>
+									</ul>
+								</li>							
+								<li class="line">
+									<input type="radio" id="select-lastminute" name="selector">
+									<label for="select-lastminute" tabindex="3"><a href="http://www.gastgeber.net/Last-Minute.asp">Last-Minute-Angebote</a></label>
+								</li>
+								<li class="line">
+									<input type="radio" id="select-sonderangebote" name="selector">
+									<label for="select-sonderangebote" tabindex="4"><a href="http://www.gastgeber.net/Sonderpreis.asp">Sonderangebote</a></label>
+								</li>				
+								<li class="line">
+									<input type="radio" id="select-anmelden" name="selector">
+									<label for="select-anmelden" tabindex="5"><a href="http://www.gastgeber.net/asps/eing/1_Eingabe.asp">Als Vermieter anmelden</a></label>
+								</li>
+								<li class="line">
+									<input type="radio" id="select-english" name="selector">
+									<label for="select-english" tabindex="6"><a href="http://www.accommodation.de">English</a></label>
+								</li>
+							</ul>
+						</nav>			
+					</div>					
+				  </template>
+ 				</div>
+			</app-drawer>
+			<div id="wrapper">
+				<app-header-layout>
+					<app-header condenses="" fixed="" effects="waterfall resize-snapped-title blend-background parallax-background" effects-config="{&quot;resize-snapped-title&quot;: {&quot;startsAt&quot;: 0.99, &quot;endsAt&quot;: 1}, &quot;blend-background&quot;: {&quot;startsAt&quot;: 0.99, &quot;endsAt&quot;: 1}}">
+						<app-toolbar main-title="" class="tallBar">
+							<paper-icon-button class="menu-icon" icon="gastgeber-icons:menu" drawer-toggle=""></paper-icon-button>
+							<div id="bar">								
+								<div>
+									<form id="schnellsuche" on-keypress="checkEnter" action="https://eu.httpbin.org/get" type="get">	
+										<paper-input id="input" on-dblclick="submit" name="name" label="Wohin geht's?" value="{{anfrage}}" auto-validate="" prevent-invalid-input="" allowed-pattern="[a-zA-Z\s\.äöüß-]" maxlength="50" required=""></paper-input>	
+										<input name="eingabe" value="[[anfrage]]" hidden="">
+									</form>
+								</div>		
+								<div>
+									<img src="../images/globus.png" alt="Logo weltweite Suche" on-tap="submit">
+								</div>
+							</div>
+							<h1>Ankommen.</h1>
+							<div id="wrapperHdrBtm">
+								<div class="rwdwn"></div>
+								<div id="ribbon">Mit Ihrem GastgeberNet</div>
+							</div>						
+						</app-toolbar>
+						<app-toolbar sticky="" condensed-title="" class="smallBar">			
+							<div id="firstBar" on-mouseover="unhoverAll">
+								<paper-icon-button class="menu-icon" icon="gastgeber-icons:menu" drawer-toggle=""></paper-icon-button>
+								<span id="sprachwahl">
+									<svg id="svg1" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+										<title>Sprachauswahl</title>
+										<defs></defs>
+										<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+											<g fill="#19b3ec">
+												<path d="M7.41421356,9 L8.29055233,8.12366123 C9.26057586,7.1536377 9.9996249,5.37060807 9.99999986,4 L12,4 L12,2 L7,2 L7,0 L5,0 L5,2 L0,2 L0,4 L7.99999973,4 C7.99956262,4.84020479 7.4713745,6.11441194 6.87633877,6.70944767 L6,7.58578644 L5.12366123,6.70944767 C4.94063656,6.526423 4.76393628,6.27914249 4.6069729,6 L2.40706289,6 L2.40706289,6 C2.71635745,6.81752931 3.17827325,7.59248681 3.70944767,8.12366123 L4.58578644,9 L1.29289322,12.2928932 L2.70710678,13.7071068 L6,10.4142136 L8.81934895,13.2335625 L9.65123928,11.2370257 L7.41421356,9 L7.41421356,9 Z M11.25,17 L10,20 L8,20 L13,8 L14,8 L15,8 L20,20 L18,20 L16.75,17 L11.25,17 L11.25,17 Z M12.0833333,15 L14,10.4 L15.9166667,15 L12.0833333,15 L12.0833333,15 Z"></path>
+											</g>
+										</g>
+									</svg>
+									<p>DE</p>
+									<div class="dropdown-lang">
+										<ul>
+											<li><a href="http://www.accommodation.de">English</a></li>
+										</ul>
+									</div>
+									<svg id="svg2" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+										<title>Sprachwahl ausklappen</title>
+										<defs></defs>
+										<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+											<g id="dropdown" fill="#19b3ec">
+												<polygon points="9.29289322 12.9497475 10 13.6568542 15.6568542 8 14.2426407 6.58578644 10 10.8284271 5.75735931 6.58578644 4.34314575 8"></polygon>
+											</g>
+										</g>
+									</svg>
+								</span>
+								<span id="title">
+									<h2><span>G</span>astgeber</h2>
+									<img class="tlbrimg" src="../images/globus.png" alt="Logo weltweite Suche" on-tap="top">
+									<h2><span>N</span>et</h2>
+								</span>
+								<div id="logoImage">
+									<img src="/images/chancy.png">
+								</div>								
+								<a href="http://gastgeber.net/asps/eing/1_Eingabe.asp">Anmelden</a>
+								<div id="suchLupe" on-tap="top">
+									<svg id="lupe" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+										<title>Schnellsuche</title>
+										<defs></defs>
+										<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+											<g id="suchIcon" fill="#fff">
+												<path d="M11.1921711,12.6063847 C10.0235906,13.4815965 8.5723351,14 7,14 C3.13400675,14 0,10.8659932 0,7 C0,3.13400675 3.13400675,0 7,0 C10.8659932,0 14,3.13400675 14,7 C14,8.5723351 13.4815965,10.0235906 12.6063847,11.1921711 L14.0162265,12.6020129 C14.6819842,12.4223519 15.4217116,12.5932845 15.9484049,13.1199778 L18.7795171,15.95109 C19.5598243,16.7313971 19.5646685,17.9916807 18.7781746,18.7781746 C17.997126,19.5592232 16.736965,19.5653921 15.95109,18.7795171 L13.1199778,15.9484049 C12.5960188,15.4244459 12.4217025,14.6840739 12.6018353,14.0160489 L11.1921711,12.6063847 Z M7,12 C9.76142375,12 12,9.76142375 12,7 C12,4.23857625 9.76142375,2 7,2 C4.23857625,2 2,4.23857625 2,7 C2,9.76142375 4.23857625,12 7,12 Z"></path>
+											</g>
+										</g>
+									</svg>
+								</div>
+							</div>	
+							<div id="secondBar">							
+								<nav>
+									<ul id="headLi">						
+										<span>
+											<li on-mouseover="dropdownDE">
+												<span>Deutschland</span>
+											</li>
+											<li on-mouseover="dropdownEU">
+												<span>Europa</span>
+												<svg id="europaList" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+													<title>Menü Länderauswahl Europa ausklappen</title>
+													<defs></defs>
+													<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+														<g id="europaListIcon" fill="#19b3ec">
+															<polygon points="9.29289322 12.9497475 10 13.6568542 15.6568542 8 14.2426407 6.58578644 10 10.8284271 5.75735931 6.58578644 4.34314575 8"></polygon>
+														</g>
+													</g>
+												</svg>
+												<div id="listEU" on-mouseleave="unhoverEU">
+													<ul>
+														<li class="ul">
+															<span>Benelux<div>ˇ</div>
+																<ul>
+																	<li>Belgien</li>
+																	<li>Niederlande</li>
+																</ul>
+															</span>
+														</li>
+														<li class="ul">
+															<span>Alpen<div>ˇ</div>
+																<ul>
+																	<li>Österreich</li>
+																	<li>Schweiz</li>
+																	<li>Slowenien</li>
+																</ul>
+															</span>
+														</li>
+														<li class="ul">
+															<span>Britische Inseln<div>ˇ</div>
+																<ul>
+																	<li>England</li>
+																	<li>Schottland</li>
+																	<li>Wales</li>
+																	<li>Nordirland</li>
+																	<li>Irland</li>																																</ul>
+															</span>
+														</li>
+														<li class="ul">
+															<span>Skandinavien und Island<div>ˇ</div>
+																<ul>
+																	<li>Norwegen</li>
+																	<li>Schweden</li>
+																	<li>Dänemark</li>
+																	<li>Island</li>			
+																</ul>
+															</span>
+														</li>
+														<li><a href="http://gastgeber.net/Frankreich">Frankreich</a></li>
+														<li><a href="http://gastgeber.net/Italien">Italien</a></li>
+														<li class="ul">
+															<span>Westliches Mittelmeer<div>ˇ</div>
+																<ul>
+																	<li>Spanien</li>
+																	<li>Portugal</li>
+																	<li>Malta</li>																																</ul>
+															</span>
+														</li>
+														<li class="ul">
+															<span>Östliches Mittelmeer<div>ˇ</div>
+																<ul>
+																	<li>Griechenland</li>
+																	<li>Kroatien</li>
+																	<li>Türkei</li>
+																	<li>Zypern</li>
+																</ul>
+															</span>
+														</li>
+														<li class="ul">
+															<span>Ost- und Südosteuropa<div>ˇ</div>
+																<ul>
+																	<li>Tschechien</li>
+																	<li>Ungarn</li>
+																	<li>Bulgarien</li>
+																	<li>Mazedonen</li>
+																	<li>Ukraine</li>
+																</ul>
+															</span>
+														</li>
+														<li class="ul">
+															<span>Nordosteuropa<div>ˇ</div>
+																<ul>
+																	<li>Polen</li>
+																	<li>Estland</li>
+																	<li>Lettland</li>
+																	<li>Litauen</li>
+																</ul>
+															</span>
+														</li>
+														<li></li>
+													</ul>
+												</div>
+											</li>
+										</span>
+										<span>
+											<li on-mouseover="dropdownWelt">
+												<span>weltweit</span>
+												<svg id="weltList" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+													<title>Menü Länderauswahl weltweit ausklappen</title>
+													<defs></defs>
+													<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+														<g fill="#19b3ec">
+															<polygon points="9.29289322 12.9497475 10 13.6568542 15.6568542 8 14.2426407 6.58578644 10 10.8284271 5.75735931 6.58578644 4.34314575 8"></polygon>
+														</g>
+													</g>
+												</svg>
+												<div id="listWelt" on-mouseleave="unhoverWelt">
+													<ul>
+														
+														<li class="ul">
+															<span>Mittel- &amp; Südamerika<div>ˇ</div>
+																<ul>
+																	<li>Brasilien</li>
+																	<li>Argentinien</li>
+																	<li>Costa Rica</li>
+																	<li>Karibik</li>
+																	<li>Paraguay</li>
+																</ul>
+															</span>
+														</li>
+														<li class="ul">
+															<span>Nordamerika<div>ˇ</div>
+																<ul>
+																	<li>USA</li>
+																	<li>Kanada</li>		
+																	<li>Mexiko</li>
+																</ul>
+															</span>
+														</li>
+														<li class="ul">
+															<span>Mittlerer Osten<div>ˇ</div>
+																<ul>
+																	<li>Israel</li>			
+																</ul>
+															</span>
+														</li>
+														<li class="ul">
+															<span>Afrika<div>ˇ</div>
+																<ul>
+																	<li>Ägypten</li>
+																	<li>Kenia</li>
+																	<li>Südafrika</li>
+																	<li>Marokko</li>
+																	<li>Namibia</li>
+																	<li>Simbabwe</li>		
+																</ul>
+															</span>
+														</li>
+														<li class="ul">
+															<span>Ozeanien<div>ˇ</div>
+																<ul>
+																	<li>Australien</li>
+																	<li>Neuseeland</li>
+																	<li>Süd-Pazifik</li>			
+																</ul>
+															</span>
+														</li>
+														<li class="ul">
+															<span>Asien<div>ˇ</div>
+																<ul>
+																	<li>China</li>
+																	<li>Indien</li>
+																	<li>Indonesien</li>
+																	<li>Kambodscha</li>
+																	<li>Malaysien</li>
+																	<li>Philippinen</li>
+																	<li>Russland</li>
+																</ul>
+															</span>
+														</li>
+														<li></li>
+													</ul></div>
+											</li>
+											<li on-mouseover="unhoverWelt"><a href="http://gastgeber.net/Last-Minute.asp">Last Minute</a></li>
+										</span>
+									</ul>
+									<div id="dropLi" on-mouseleave="unhover">			
+										<input type="radio" name="auswahl" checked="checked" id="span-one">	
+										<input type="radio" name="auswahl" id="span-two">	
+										<input type="radio" name="auswahl" id="span-three">
+										<div class="left">
+											<label for="span-three">‹</label>
+											<label for="span-one">‹</label>
+											<label for="span-two">‹</label>
+										</div>
+										<div class="right">
+											<label for="span-two">›</label>
+											<label for="span-three">›</label>
+											<label for="span-one">›</label>
+										</div>
+										<ul id="dropLiUl">
+											<span>
+												<li>
+													<h4>Schleswig-Holstein</h4>
+													<a href="http://gastgeber.net/Regionen.asp?Bland=15"><img src="/images/schleswig-holstein.jpg" alt="Schleswig-Holstein"></a>
+												</li>
+												<li>
+													<h4>Bayern</h4>
+													<a href="http://gastgeber.net/Regionen.asp?Bland=2"><img src="/images/bayern.jpg" alt="Bayern"></a>
+												</li>
+												<li>
+													<h4>Niedersachsen</h4>
+													<a href="http://gastgeber.net/Regionen.asp?Bland=1"><img src="/images/niedersachsen.jpg" alt="Niedersachsen"></a>
+												</li>
+											</span>
+											<span>
+												<li>
+													<h4><span>Brandenburg &amp;</span><span id="mcPm">Mecklenburg-Vorpommern</span></h4>
+													<a href="http://gastgeber.net/Regionen.asp?Bland=8"><img src="/images/mecklenburg.jpg" alt="Brandenburg und Mecklenburg-Vorpommern"></a>
+												</li>	
+												<li>
+													<h4>Baden-Württemberg</h4>
+													<a href="http://gastgeber.net/Regionen.asp?Bland=1"><img src="/images/bawue.jpg" alt="Baden-Württemberg"></a>
+												</li>
+												<li>
+													<h4><span>Hamburg &amp;</span><span>Berlin</span></h4>
+													<a href="http://gastgeber.net/Regionen.asp?Bland=3"><img src="/images/berlin.jpg" alt="Hamburg und Berlin"></a>
+												</li>
+											</span>
+											<span>
+												<li>
+													<h4><span>Hessen</span><span>Rheinland-Pfalz &amp;</span><span>Saarland</span></h4>
+													<a href="http://gastgeber.net/Regionen.asp?Bland=11"><img src="/images/saarland.jpg" alt="Hessen, Rheinland-Pfalz und Saarland"></a>
+												</li>
+												<li><h4>Nordrhein-Westfalen</h4>
+													<a href="http://gastgeber.net/Regionen.asp?Bland=10"><img src="/images/nrw.jpg" alt="Nordrhein-Westfalen"></a>
+												</li>
+												<li>
+													<h4><span>Sachsen</span><span>Sachsen-Anhalt &amp;</span><span>Thüringen</span></h4>
+													<a href="http://gastgeber.net/Regionen.asp?Bland=13"><img src="/images/thueringen.jpg" alt="Sachsen, Sachsen-Anhalt und Thüringen"></a>
+												</li>
+											</span>
+										</ul>
+									</div>				
+								</nav>	
+							</div>
+						</app-toolbar>								
+					</app-header>
+					<main>
+						<section>
+							<h2>Top-Themen</h2>
+							<div id="themes">
+									<div class="textImgContainer" id="strand">		
+										<a href="http://strandurlaub.gastgeber.net/">
+										<div class="textContainer">
+											<h2>Strandurlaub</h2>
+										</div>	
+										<img src="/images/Strandurlaub_680.jpg" alt="Strandurlaub" srcset="/images/Strandurlaub_423.jpg 423w, /images/Strandurlaub_680.jpg 680w, /images/Strandurlaub_512.jpg 512w, /images/Strandurlaub_320.jpg 320w" sizes="(max-width: 567px) 100vw,
+													(max-width: 739px) calc(50vw - 1.5rem),
+													(max-width: 1365px) calc(50vw - 2.25rem),
+													412.67px">
+										</a>
+									</div>
+									<div class="textImgContainer" id="stadt">		
+										<a href="http://city-apartment.gastgeber.net/">											
+										<div class="textContainer">
+											<h2>Städtereisen</h2>
+										</div>							
+										<img src="/images/Staedtereisen_680.jpg" alt="Städtereisen" srcset="/images/Staedtereisen_423.jpg 423w, /images/Staedtereisen_680.jpg 680w, /images/Staedtereisen_512.jpg 512w, /images/Staedtereisen_320.jpg 320w" sizes="(max-width: 567px) 100vw,
+													(max-width: 739px) calc(50vw - 1.5rem),
+													(max-width: 1365px) calc(50vw - 2.25rem),
+													412.67px">
+										</a>
+									</div>				
+								<div class="textImgContainer bigImgRight" id="hund">			
+										<a href="http://urlaub-mit-hund.gastgeber.net/">
+									<div class="textContainer bigImgText">
+										<h2 class="bigImgh2">Urlaub mit Hund</h2>
+									</div>												
+									<img src="/images/Urlaub-mit-Hund_839.jpg" alt="Urlaub mit Hund" srcset="/images/Urlaub-mit-Hund_839.jpg 839w, /images/Urlaub-mit-Hund_680.jpg 680w, /images/Urlaub-mit-Hund_512.jpg 512w, /images/Urlaub-mit-Hund_320.jpg 320w" sizes="(max-width: 567px) 100vw,
+												(max-width: 739px) calc(50vw - 1.5rem),
+												(max-width: 1365px) calc(50vw - 2.25rem),
+												857.33px">
+									</a>
+								</div>
+								<div class="textImgContainer" id="bauernhof">			
+										<a href="http://bauernhof.gastgeber.net/">
+										<div class="textContainer">
+											<h2>Urlaub auf dem Bauernhof</h2>
+										</div>							
+										<img src="/images/Bauernhof_680.jpg" alt="Bauernhof" srcset="/images/Bauernhof_423.jpg 423w, /images/Bauernhof_680.jpg 680w, /images/Bauernhof_512.jpg 512w, /images/Bauernhof_320.jpg 320w" sizes="(max-width: 567px) 100vw,
+													(max-width: 739px) calc(50vw - 1.5rem),
+													(max-width: 1365px) calc(50vw - 2.25rem),
+													412.67px">
+										</a>
+								</div>
+								<div class="textImgContainer" id="gastgeber">		
+										<div class="textContainer">
+											<h2>Willkommen im Gastgeber-Net!</h2>
+											<h3>große Auswahl an Ferienwohungen und Ferienhäusern weltweit</h3>
+										</div>							
+										<img src="/images/Auswahl_423.jpg" alt="bunte Ferienhäuser">
+								</div>
+								<div class="textImgContainer" id="reiterhof">			
+										<a href="http://reiterhof.gastgeber.net/">	
+										<div class="textContainer">
+											<h2>Reiterhof-Ferien</h2>
+										</div>							
+										<img src="/images/Reiterhof_680.jpg" alt="Reiterhof" srcset="/images/Reiterhof_423.jpg 423w, /images/Reiterhof_680.jpg 680w, /images/Reiterhof_512.jpg 512w, /images/Reiterhof_320.jpg 320w" sizes="(max-width: 567px) 100vw,
+													(max-width: 739px) calc(50vw - 1.5rem),
+													(max-width: 1365px) calc(50vw - 2.25rem),
+													412.67px">
+										</a>
+								</div>
+								<div class="textImgContainer bigImgLeft" id="ski">			
+										<a href="http://skiurlaub.gastgeber.net/">
+									<div class="textContainer bigImgText">
+										<h2 class="bigImgh2">Skiurlaub</h2>
+									</div>			
+									<img src="/images/Skiurlaub_839.jpg" alt="Skiurlaub" srcset="/images/Skiurlaub_839.jpg 839w, /images/Skiurlaub_680.jpg 680w, /images/Skiurlaub_512.jpg 512w, /images/Skiurlaub_320.jpg 320w" sizes="(max-width: 567px) 100vw,
+												(max-width: 739px) calc(50vw - 1.5rem),
+												(max-width: 1365px) calc(50vw - 2.25rem),
+												857.33px">
+									</a>
+								</div>
+									<div class="textImgContainer" id="wandern">			
+										<a href="http://wanderurlaub.gastgeber.net/">
+										<div class="textContainer">
+											<h2>Wanderurlaub</h2>
+										</div>							
+										<img src="/images/Wanderurlaub_680.jpg" alt="Wanderurlaub" srcset="/images/Wanderurlaub_423.jpg 423w, /images/Wanderurlaub_680.jpg 680w, /images/Wanderurlaub_512.jpg 512w, /images/Wanderurlaub_320.jpg 320w" sizes="(max-width: 567px) 100vw,
+													(max-width: 739px) calc(50vw - 1.5rem),
+													(max-width: 1365px) calc(50vw - 2.25rem),
+													412.67px">
+										</a>
+									</div>
+									<div class="textImgContainer" id="kultur">		
+										<a href="http://kultururlaub.gastgeber.net/">
+										<div class="textContainer">
+											<h2>Kultururlaub</h2>
+										</div>							
+										<img src="/images/Kultururlaub_680.jpg" alt="Kultururlaub" srcset="/images/Kultururlaub_423.jpg 423w, /images/Kultururlaub_680.jpg 680w, /images/Kultururlaub_512.jpg 512w, /images/Kultururlaub_320.jpg 320w" sizes="(max-width: 567px) 100vw,
+													(max-width: 739px) calc(50vw - 1.5rem),
+													(max-width: 1365px) calc(50vw - 2.25rem),
+													412.67px">
+										</a>
+									</div>	
+							</div>		
+						</section>
+						<section id="regionen" class="largeOnly" on-mouseover="unhover">
+							<h2>Top-Regionen</h2>
+							<div id="regioList">
+								<div class="textImgContainer full" id="schwarzwald">
+									<a href="http://gastgeber.net/BLNr1-Schwarzwald.htm">
+									<div class="textContainer">
+										<h2 class="panoh2">Schwarzwald</h2>
+									</div>										
+									<img src="/images/pano.jpg" alt="Panorama Feldberg im Schwarzwald">
+									</a>
+								</div>
+								<div class="textImgContainer twothird" id="nordsee">
+									<a href="http://gastgeber.net/Liste.asp?BLNr=15&amp;Region=Nordseek%FCste">
+									<div class="textContainer">
+										<h2 class="largeh2">Nordseeküste</h2>
+									</div>										
+									<img src="/images/nordsee.jpg" alt="Panorama Nordseehafen">
+									</a>
+								</div>
+								<div class="textImgContainer onethird" id="alpen">
+									<a href="http://gastgeber.net/Schweiz">
+									<div class="textContainer">
+										<h2 class="largeh2">Alpen</h2>
+									</div>										
+									<img src="/images/alpen.jpg" alt="Alpenwiese">
+									</a>
+								</div>
+								<div class="textImgContainer onethird" id="italien">
+									<a href="http://gastgeber.net/Liste.asp?BLNr=20&amp;Region=Lombardei">
+									<div class="textContainer">
+										<h2 class="smallh2">italienische Seen</h2>
+									</div>										
+									<img src="/images/italienische-seen.jpg" alt="italienische Seen">
+									</a>
+								</div>
+								<div class="textImgContainer twothird" id="england">
+									<a href="http://gastgeber.net/BLNr37-Cornwall.htm">
+									<div class="textContainer">
+										<h2 class="largeh2">Südwestengland</h2>
+									</div>										
+									<img src="/images/england.jpg" alt="Küste Devon">
+									</a>
+								</div>
+							</div>
+							<h2>&amp; viele mehr!</h2>
+							
+						</section>
+					</main>
+					<footer>
+						<section>
+							<h4>Wir über uns</h4>						
+							<div itemscope="" itemtype="http://schema.org/LocalBusiness">
+								<h5 itemprop="name" class="name">GastgeberNet</h5>
+								<p>Inhaber und inhaltlich verantwortlich:</p>
+								<div>
+									<div class="column">
+										<h5><span itemprop="founder">Johannes Bennemann</span></h5>
+										<div itemprop="address" itemscope="" itemtype="http://schema.org/PostalAddress">
+											<p itemprop="streetAddress">Madame-Curie-Str. 1</p>
+											<div><span itemprop="postalCode">46397</span> <span itemprop="addressLocality">Bocholt</span></div>	
+											<p itemprop="addressCountry">Deutschland</p>
+										</div>
+									</div>
+									<div class="column">
+										<p>Fax : <span itemprop="faxNumber">+49 700 2470 7070</span> *</p>
+										<p>Tel.: <span itemprop="telephone">+49 700 2470 7000</span> *</p>
+										<p>E-Mail:	<span itemprop="email">info@gastgeber.net</span></p>
+										<p>USt-IdNr.: <span itemprop="taxID">DE 175510869</span></p>
+									</div>
+								</div>
+							</div>
+							<p>Inhaber und inhaltlich verantwortlich für die Angebotsseiten sind die jeweiligen Vermieter.</p>
+							<p>(* Mo.-Fr. 10:00-16:00 Uhr, 12 ct/Minute)</p>
+						</section>
+						<section>
+							<p>Als im Herbst 1998 die Idee geboren wurde ein Verzeichnis für private Gäste- und Ferienwohnungen im Internet aufzubauen, konnte noch niemand ahnen, daß wir mit dem GASTGEBER schon nach 6 Monaten zu den großen internationalen Verzeichnissen der Branche weltweit gehören würden und in Europa sogar zu diesem Zeitpunkt bereits einer der größten Anbieter sein sollten.</p>
+							<p>Dieser Erfolg hat unseren Anspruch gefestigt, den GASTGEBER als das Standardwerk für private Unterkünfte zu etablieren und allen Nutzern des GASTGEBER auch in Zukunft noch viele interessante Objekte vorzustellen. Wir bedanken uns an dieser Stelle noch einmal bei allen unseren Kunden, die für diesen Erfolg mitverantwortlich sind.</p>
+							<p>Wir, das sind Johannes Bennemann, Jahrgang '64, Studium der Betriebswirtschaft in Nürnberg, Geschäftsführer der Agentur "Zeitwohn-Immobilien" in Essen, Mitglied im REM e.V. (Ring europäischer Mitwohnzentralen), Herausgeber des Gastgeberverzeichnisses für die Stadt Essen (bis 2003),</p>
+							<p>sowie:</p>
+							<p>Christine Berg, Marcella Caramanna, Thomas Eckey, Vanessa Gille, Sengül Gümüs, 
+	Alexander Kimoto, Rajmund Minkus und Maria José Staudinger.</p>
+						</section>
+					</footer>
+				</app-header-layout>
+			</div>
+		</app-drawer-layout>
+		<footer>
+
+		</footer>
+
+	</template>
+
+	<script>Polymer({is:"gastgeber-net",properties:{smallScreen:{type:Boolean},anfrage:{type:String,value:"",notify:!0}},openSub:function(t){var e=Polymer.dom(this.root).querySelector(".active");null!=e&&Polymer.dom(e).classList.remove("active");var s=Polymer.dom(this.root).querySelector(".blue");null!=s&&Polymer.dom(s).classList.remove("blue"),Polymer.dom(t.target).setAttribute("class","blue style-scope gastgeber-net"),Polymer.dom(t.target).nextElementSibling.setAttribute("class","active style-scope gastgeber-net")},dropdownDE:function(){this.$.dropLi.style.display="block",this.$.listEU.style.display="none"},unhover:function(){this.$.dropLi.style.display="none"},dropdownEU:function(){this.$.listEU.style.display="block",this.$.dropLi.style.display="none"},unhoverEU:function(){this.$.listEU.style.display="none"},dropdownWelt:function(){this.$.listWelt.style.display="block",this.$.listEU.style.display="none"},unhoverWelt:function(){this.$.listWelt.style.display="none"},unhoverAll:function(){this.$.dropLi.style.display="none",this.$.listEU.style.display="none",this.$.listWelt.style.display="none"},submit:function(){this.$.schnellsuche.submit()},checkEnter:function(){window.event&&13==window.event.which&&this.$.schnellsuche.submit()},top:function(){window.scrollTo(0,0),this.$.input.focus()}});</script>
+</dom-module></body></html>

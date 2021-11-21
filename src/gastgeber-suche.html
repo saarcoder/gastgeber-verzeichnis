@@ -1,0 +1,2706 @@
+<html><head><link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/vaadin-date-picker/vaadin-date-picker.html">
+<link rel="import" href="../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="gastgeber-icons.html">
+<link rel="icon" href="images/manifest/favicon.ico">
+<link href="https://fonts.googleapis.com/css?family=Cormorant:700|Caveat:400" rel="stylesheet">
+
+</head><body><dom-module id="gastgeber-suche">
+
+	<template>
+
+		<style>
+			:host {
+				display: block;
+				--app-primary-color: #19b3ec;
+				--primary-color: #19b3ec;
+				--app-secondary-color: #076499;
+				--light-primary-color: #076499;
+				--vaadin-date-picker-overlay: {
+						z-index: 2;
+					};
+			}
+			a {
+				text-decoration: none;
+				color: inherit;
+			}     
+			ul {				
+				margin: 0;
+				padding: 0;
+				-webkit-padding-start: 0;
+			} 
+			li {
+				list-style-type: none;
+				display: inline;
+			}
+			h2, h3, ul, li, a {
+			    -webkit-margin-before: 0;
+    			-webkit-margin-after: 0;
+				-webkit-padding-start: 0;
+			}
+			app-drawer-layout {
+				background: #fff;
+			}
+			app-header {
+				height: 60vw;
+				width: 100%;
+				color: #fff;
+				--app-header-background-front-layer: {
+					background-image: url(../images/Auswahl.jpg);
+					background-position: left top;
+					background-repeat: no-repeat;
+					-webkit-backdrop-filter: saturate(150%);
+					backdrop-filter: saturate(150%);
+					z-index: -1;
+				};	
+			}			
+			.tallBar {				
+				padding: 0;
+				height: 60vw;
+				display: flex;
+				flex-direction: column;				
+			}
+			.tallBar > paper-icon-button {
+				position: absolute;
+				left: 0;
+				top: 0;
+				height: 1.5rem;
+				width: 1.5rem;
+				--paper-icon-button-ink-color: lightblue;
+				border-radius: 50%;
+				border: 1px solid var(--app-secondary-color);
+				background: radial-gradient(rgba(7,100,153,.85) 45%, transparent);	
+				color: #fff;	
+				box-shadow: 0 0 .025rem .025rem var(--app-primary-color), inset 0 0 1.5rem aqua;
+				line-height: .25rem;
+				padding: .32rem;
+				margin-top: .45rem;
+				z-index: 1;
+			}
+			#bar {	
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100vw;
+				height: 36px;
+				background-color: rgba(255,255,255,0.75);
+			}
+			form#schnellsuche {
+				position: relative;
+				height: 30px;
+				width: 60vw;
+				margin: -15px auto 0 auto;
+				z-index: 1;
+			}
+			paper-input {		
+				height: 30px;	
+				font-weight: 100;
+				z-index: 2;
+				--paper-input-container-invalid-color: limegreen;
+				--paper-input-container-underline: {
+					display: none;
+				};
+				--paper-input-container-underline-focus: {
+					font-weight: 100;
+				};
+				--paper-input-container: {
+					padding: 0;
+					margin: 0;
+				};
+				--paper-input-container-label: {
+					margin-top: 7px;
+					line-height: 1;
+					font-size: 1rem;
+					font-weight: 500;
+					letter-spacing: .3px;
+					text-align: center;
+					color: var(--app-secondary-color);
+				};
+				--paper-input-container-label-focus: {
+					font-weight: 100;
+				};
+				--paper-input-container-label-floating: {
+					margin-top: .75rem;
+					font-size: .8rem;
+					padding-bottom: .2rem;
+					color: var(--app-secondary-color);
+				};
+				--paper-input-container-input: {
+					font-size: .9rem;
+					font-weight: 500;
+					margin-top: .2rem;
+					margin-bottom: -.2rem;
+					letter-spacing: 1px;
+					text-align: center;
+					z-index: 2;
+					color: var(--app-secondary-color);
+				};
+			}
+			.tallBar form input {
+				display: none;
+			}
+			[main-title] img {
+				position: absolute;
+				top: 0;
+				right: 0;
+				height: 1.8rem;
+				width: 1.8rem;
+				margin:.25rem .5rem 0 .25rem;
+				transform: rotate(-5deg);
+			}		
+										
+			[main-title] h1 {
+				font: 10vw 'Caveat', cursive;
+				font-weight: 100;
+				text-shadow: 0 0 .25rem #000, 0 0 .75rem rgba(50,50,50,.9);
+				letter-spacing: 2px;
+				text-align: center;
+				color: #fff;
+				margin-top: 29vw;
+			}			
+			#wrapperHdrBtm {
+				margin-top: 12vw;
+			}
+			.rwdwn {
+				position: relative;
+				width: 100vw;
+				height: 0;
+				z-index: -1;
+			}			
+			.rwdwn::before {
+				position: absolute;
+				content: '';
+				left: 0;
+				bottom: 0;
+				width: 0;
+				height: 0;
+				border-left: 50vw solid #fff;
+				border-right: 50vw solid #fff;
+				border-top: 5vw solid transparent;
+				z-index: -1;
+			}		
+			#ribbon {
+				position: absolute;
+				margin: -7vw auto 0 auto;
+				left: calc(50vw - 78.3px);
+				height: 13px;
+				border-radius: 2px;
+				padding: 8px 12px 8px 12px;
+				color: #fff;
+				font: 13px 'Caveat', cursive;
+				text-align: center;
+				letter-spacing: 1px;
+				text-shadow: 0px -1px 1px rgba(0, 0, 0, 0.7);
+				box-shadow: inset 0px 1px 5px rgba(255, 255, 255, .3), inset 0px 0px 25px rgba(0, 150, 200, 1), 0px 2px 10px rgba(0, 0, 0, 0.8);
+				background: -webkit-linear-gradient(top, #076499 10%, #19b3ec);
+			}			
+			#ribbon::before,
+			#ribbon::after {
+				position: absolute;
+				color: #045584;
+				font-size: 12px;
+				line-height: 20px;
+				top: 5px;
+				height: 0;
+				width: 18px;
+				bottom: -.5em;
+				border: 15px solid #179ccd;
+				z-index: -1;
+			}			
+			#ribbon::before {
+				content: '\25E5';
+				text-align: right;
+				left: -21px;
+				border-right-width: 0;
+				border-left-color: transparent;
+				text-indent: 10px;
+			}			
+			#ribbon::after {
+				content: '\25E4';
+				right: -21px;
+				border-left-width: 0;
+				text-indent: -10px;
+				border-right-color: transparent;
+			}						
+			.smallBar {
+				position: relative;
+				width: 100%;
+				height: 36px;
+				margin-top: -60vw;
+				padding: 0;
+				color: var(--app-primary-color);	
+		        box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.2);
+			}
+			#firstBar {
+				position: absolute;
+				top: 0;
+				width: 100%;
+				height: 36px;
+				display: flex;
+				flex-flow: row nowrap;
+				justify-content: space-between;
+				align-items: center;
+				background: var(--app-secondary-color);
+				box-shadow: inset 0 0 .5rem rgba(0,0,0,.15);
+			}				
+			paper-icon-button {
+				height: 2rem;
+				width: 2rem;
+				margin: -.25rem 0 0 .75rem;
+			}	
+			#sprachwahl {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 36px;
+				margin: .25rem .25rem 0 2.75rem;
+			}
+			#sprachwahl > #svg1 {
+				display: none;
+			}		
+			#sprachwahl > p {
+				position: relative;
+				display: inline-block;
+				font: 500 .7rem/1 sans-serif;
+				color: #19b3ec;	
+				top: -.15rem;
+				margin-left: -.2rem;
+			}
+			#sprachwahl > #svg2 {
+				position: relative;
+				height: .7rem;
+				width: .7rem;
+				margin-left: -.3rem;
+				top: -.05rem;
+			} 
+			#dropdown {
+				fill: #aab;
+			}
+			#sprachwahl:hover #dropdown {
+				fill: #19b3ec;
+			}
+			.dropdown-lang {
+				display: none;
+				position: absolute;
+				top: 36px;
+				right: 0;
+				margin: -.2rem -.25rem 0 0;
+				min-width: 25%;				
+				background-color: rgba(0,0,0,.85);
+				border-bottom: 2px solid var(--app-secondary-color);
+			}
+			#sprachwahl:hover .dropdown-lang {
+				display: block;
+				z-index: 2;
+			}
+			.dropdown-lang ul {
+				display: flex;
+				height: 36px;
+				justify-content: center;
+				align-items: center;
+				cursor: pointer;
+			}
+			.dropdown-lang li{
+				font-size: 1rem;
+				padding: 1rem;
+				line-height: 2;
+			}		
+			#title {
+				position: absolute;
+				top: 0;
+				left: calc(50vw - 62px + .25rem);
+			}
+			#firstBar h2 {
+				display: inline;			
+				font-size: .75rem;
+				font-family: 'Cormorant', serif;
+				text-transform: uppercase;
+				background-image: -webkit-linear-gradient(90deg, var(--app-primary-color) 20%,  aqua 40%, var(--app-primary-color) 60%, aqua 80%);
+				-webkit-background-clip: text;
+				background-clip: text;
+				-webkit-text-fill-color: transparent;
+			}
+			#firstBar h2 > span {
+				font-size: .85rem;			
+			}
+			[condensed-title] img {		
+				position: relative;		
+				height: 1.5rem;
+				width: 1.5rem;
+				margin: .45rem -.2rem -.45rem -.1rem;
+				transform: rotate(-5deg);
+			}
+			#logoImage{
+				display: none;
+			}
+			#firstBar > a {
+				display: none;
+			}
+			#suchLupe {				
+				height: 36px;
+				width: 36px;
+				display: flex;
+				background-color: var(--app-primary-color);
+				cursor: pointer;
+			}
+			#lupe {
+				position: relative;
+				width: .85rem;
+				height: .85rem;
+				margin: auto;
+			}
+			#secondBar {
+				display: none;
+			}						
+			app-drawer {
+				--app-drawer-scrim-background: -webkit-linear-gradient(125deg, rgba(13,93,163,.94) 5%, rgba(115,191,58,.94) 75%);
+				--app-drawer-content-container: {
+					width: 100vw;
+				};
+			}	
+			.drawer-contents {
+				height: 100%;
+				overflow-y: auto;
+				box-sizing: border-box;
+			}
+			.chance-container {
+				position: relative;
+				height: 125px;
+				width: 125px;
+				margin: 30px auto 5px auto;		
+			}			
+			.chance-container .image {
+				background-image: url('../images/chancy.png');
+				background-size: contain;
+				border-radius: 50%;
+				border: 3px solid var(--app-primary-color);
+				height: 100%;
+				width: 100%;
+			}			
+			.contact-info {
+				margin: 0 20px;
+				height: 115px;
+				text-align: center;
+			}			
+			.contact-info h2 {
+				font-size: 24px;
+				font-family: 'Cormorant', serif;
+				text-transform: uppercase;
+				margin: 0 auto;
+				background: -webkit-linear-gradient(var(--app-primary-color), var(--app-secondary-color));
+				-webkit-background-clip: text;
+				background-clip: text;
+				-webkit-text-fill-color: transparent;
+			}			
+			h2 .initial-letter {
+				font-size: 32px;
+			}			
+			hr {
+				width: 200px;
+				margin-top: -4px;				
+			}			
+			.contact-info h3 {
+				margin: 15px auto 35px auto;
+				font-size: 13px;
+				font-weight: 100;
+				line-height: 1.3em;
+				color: var(--app-secondary-color);
+				max-width: 220px;
+			}			
+			.drwrbtm {
+				width: 100%;
+				height: 100%;
+				min-height: 1225px;
+				background-color: var(--app-secondary-color);
+				background-image: linear-gradient(90deg, transparent 50%, rgba(255,255,255,.4) 50%);
+				background-size: 75px 75px;
+				padding: 2.25rem 0 1.5rem 0;
+				color: #fff;
+				text-align: center;
+				font: 500 1.25rem/2 sans-serif;
+			}	
+			.line [type=radio] {
+				display: none;
+			}
+			.line [type=radio]:checked ~ label, .line [type=radio]:checked ~ label ~ .content {
+				display: block;				
+				width: calc(8 * 37.5px);		
+				margin-left: calc(50% - 4*37.5px);
+				background: linear-gradient(to top, var(--app-secondary-color), rgba(7,100,153,.75));
+				box-shadow: 1px 1px 10px #054c75, -1px -1px 10px #054c75, 0 -3px 0 -10px #6aa2c2;
+			}
+			.line [type=radio]:checked ~ label {
+				border-bottom: 3px solid #def;
+			}
+			.line [type=radio]:checked ~ label ~ .content {
+				background: linear-gradient(180deg, rgba(7,100,153,.85), rgba(106,162,194,.85));
+				margin-bottom: 1.5rem;
+			}
+			.line [type=radio]:checked ~ label ~ .content > li:first-of-type {
+				padding-top: 1.75rem;
+			}
+			.line [type=radio]:checked ~ label ~ .content > li:last-of-type {
+				border-bottom: 3px solid #def;
+				padding-bottom: 1.25rem;
+			}
+			.content {
+				display: none;			
+			}		
+			.content > * {
+				padding: .75rem 0;
+			}
+			.line > label {
+				line-height: 3.5rem;
+				outline: none;
+			}
+			.line > label:hover, .line > label:focus, .line > label > a:focus, .line > label > a:hover {
+				text-shadow: 0 0 1px #fff, 0 0 1rem #054c75;
+				outline: none;
+			}
+			.content > li {
+				line-height: 1.5;
+			}
+			.content > li > div {
+				outline: none;				
+			}
+			.content > li > div.blue {
+				color: #00e2ff;
+			}
+			.content > li > div.blue:hover {
+				text-shadow: none;
+			}
+			.drwrbtm li, .drwrbtm a {
+				display: block;
+				text-decoration: none;
+			}		
+			.content > li > ul {
+				display: none;
+			}
+			.content > li > a:focus, .content > li > a:hover {
+				color: var(--app-primary-color);
+			}
+			.content > li > ul.active {
+				display: block;
+				background: linear-gradient(to bottom, rgba(7,100,153,.5), transparent, rgba(7,100,153,.5));
+			}
+			.content > li:last-of-type > ul {
+				position: relative;
+				margin-bottom: -1.25rem;
+			}
+			.content > li > ul.active > li {
+				padding: .5rem 0;
+				color: #fff;
+			}
+			.content > li > ul > li:first-of-type {
+				padding-top: 1rem;
+				margin-top: .5rem;
+			}
+			.content > li > ul > li:last-of-type {
+				padding-bottom: 1rem;
+			}
+			.content > li > div:hover, content > li > div:focus {
+				color: #00e2ff;
+			}
+			.content > li > ul > li:hover{
+				color: var(--app-primary-color);
+			}
+			.content > li > ul > li:focus{
+				color: #fff;
+			}
+			#thirdBar {
+				position: absolute;
+				top: 31px;
+				margin-top: 5px;
+				left: 0;
+				right: 0;
+				width: 100vw;	
+				height: calc(50px + 35px);	
+				z-index: 0;				
+			}
+			.boxShadow {
+				box-shadow: 0 .35rem .5rem -.5rem #000;
+				background: #fff;
+			}			
+			#thirdBar > div {
+				display: flex;
+				justify-content: center;
+				padding: 0;
+				width: calc(100vw - 25px - 2rem);
+				background: #fff;
+				z-index: 0;
+			}
+			.vaadin {
+				margin-left:  -100vw;
+				transition: transform .35s, box-shadow .35s ease-in-out;
+			}
+			vaadin-date-picker {
+				width: 42%;
+				padding: .5rem .5rem 0 0;
+				--paper-input-container: {
+					height: 55px;
+					padding-top: 0;
+					padding-bottom: 1rem;
+					};
+				--paper-input-container-label: {	
+					color: var(--app-primary-color);	
+					line-height: 1.75;				
+					};
+				--paper-input-container-label-floating: {
+					margin-top: .75rem;
+					padding-bottom: .2rem;	
+					font-size: 1rem;	
+					};
+				--vaadin-date-picker-calendar-icon: {
+					fill: var(--app-primary-color);		
+					margin-top: -10px;
+					};
+				--paper-input-container-input: {
+					font-size: .75rem;
+				}
+				--paper-input-container-focus-color: var(--app-primary-color);
+			}
+			main > section {		
+				margin: 2rem 0;
+				color: var(--app-primary-color)
+			}
+			main > section > div:first-of-type {
+				padding: 1rem 2.5rem 1rem 4rem;
+			}
+			main > section > div > h2 {
+				margin-top: 1rem;
+				margin-bottom: .5rem;
+				text-align: center;
+				font: 300 calc(1.5vw + 1.25rem)/1 'Caveat', cursive;
+			}	
+			main > section > div > div#listCont {
+				display: flex;
+				flex-direction: column;
+			}
+			#listCont > iron-list {
+				color: var(--app-secondary-color)
+			}
+			.fewoTitle {
+				margin-top: 1.75rem;
+			}
+			.fewoCont {
+				margin-bottom: .5rem;
+				max-width: 600px;
+			}
+			.fewoImg {
+				height: calc((100vw - 7rem) * .665);
+				width: calc(100vw - 7rem);
+				left: 0;
+				margin: .7rem 0 .5rem 0;
+				border: .5rem solid #fff;
+				box-shadow: 0 0 .45rem #555;
+			}
+			.fewoTxt {
+				margin: 0;
+				margin-top: .5rem;
+			}
+			.fewoLnk {
+				color: var(--app-primary-color);
+				margin: .25rem 0;
+			}
+			.ort {
+				margin-bottom: .75rem;
+			}
+			.ort > span {
+				position: relative;
+				top: .25rem;
+				font: 300 2rem/1.5 'Caveat', cursive; 
+				text-shadow: 0 0 .075rem var(--app-primary-color)
+			}
+			.ort > paper-icon-button {
+				display: inline-block;
+				height: 3.25rem;
+				width: 3.25rem;
+				color: var(--app-secondary-color);
+				margin: 0 1rem;
+				box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.14),
+                  0 1px 18px 0 rgba(0, 0, 0, 0.12),
+                  0 3px 5px -1px rgba(0, 0, 0, 0.4);
+				background: none;
+				border: .25rem solid var(--app-primary-color);
+				border-radius: 50%;
+				cursor: default;
+			}
+			.fewoIcon {
+				display: flex;
+				justify-content: space-around;
+				width: 100%;
+				height: 7rem;
+				padding-top: 1.25rem;
+				margin-bottom: 2.5rem;
+				color: var(--app-primary-color);
+			}
+			.fewoIcon > div {	
+				display: flex;
+				flex-direction: column;
+				flex: 1;
+				justify-content: space-around;
+				align-items: center;
+			}
+			.fewoIcon > div:nth-of-type(2) {
+				border-left: .125rem solid var(--app-primary-color);;
+				border-right: .125rem solid var(--app-primary-color);;
+			}
+			.fewoIcon > div > span {
+				-webkit-box-decoration-break: clone;
+          		box-decoration-break: clone;
+				padding: 0 1rem;
+				text-align: center;
+			}
+			.fewoIcon > div > span:last-of-type {
+				font-weight: 700;
+				font-size: 1.125rem;
+			}
+			.fewoIcon paper-icon-button {
+				box-shadow: none;
+				border: none;
+				background: none;
+				height: 2.75rem;
+				width: 2.75rem;
+				padding: 0;
+				margin: 0;
+				color:  var(--app-primary-color);
+				cursor: default;
+			}
+			#kalender {
+				display: none
+			}
+			.control {
+				color: #fff;
+				background: var(--app-primary-color);
+				border: .2rem solid #fff;
+				border-left: none;
+				border-radius: 0 .35rem .35rem 0;
+				box-shadow: 0 0 .5rem -.125rem #000, inset 0 0 2.5rem var(--app-secondary-color);
+			}
+			#dates {
+				position: fixed;
+				margin-top: 1.25rem;
+				margin-left: 0;
+				width: 41px;
+				height: 50px;
+				padding: 8px;
+				z-index: 1;
+			}
+			#euro {
+				margin: 17.5rem 1rem 0 0;	
+				font-size: 1.65rem;					
+				padding: .1rem .75rem;
+				z-index: 1;
+			}
+			#number {
+				margin: 26.75rem 1rem 0 -57px;
+				width: 41px;
+				height: 50px;
+				padding: 5px 8px;		
+				z-index: 1;
+			}
+			#w100, #containerNumberFilter  {
+				position: fixed;
+				width: 100vw;
+				height: 4.75rem;
+				z-index: 0;
+			}
+			#w100, #preisFilter {
+				top: 120px;
+			}
+			#containerNumberFilter, #numberFilter {
+				top: 195px;
+			}
+			#preisFilter, #numberFilter {
+				position: fixed;
+				margin-left: -100vw;
+				width: calc(100vw - 41px - 2rem);
+				height: 4.75rem;
+				z-index: 1;
+				background: #fff;
+			}
+			.preisFilter {
+				transition: transform .35s ease-in-out;
+			}
+			.fromLeft {
+				transform: translateX(calc(100vw + 41px + 1rem));
+			}	
+			.boxShadowTB {
+				box-shadow: 0 .35rem .5rem -.5rem #000, 0 -.35rem .5rem -.5rem #000;
+				background: #fff;
+			}
+			#preisFilter h3, #numberFilter h3 {
+				color: var(--app-primary-color);
+				font-weight: 500;
+				font-size: 1rem;
+				text-transform: uppercase;
+				text-align: center;
+				padding: .75rem 1.5rem 0 0;
+				margin-bottom: -.5rem;
+			}
+			#preisFilter div, #numberFilter div {
+				display: none;
+			}
+			paper-slider {
+				width: 85%;
+				margin: 0 auto .35rem auto;
+				 --paper-slider-knob-color: var(--app-primary-color);
+				 --paper-slider-active-color: var(--app-primary-color);
+				 --paper-slider-markers-color: var(--app-secondary-color);
+				 --paper-slider-pin-color: var(--app-primary-color);
+				 --paper-slider-knob-start-color: var(--app-primary-color);
+				 --paper-slider-pin-start-color: var(--app-primary-color);
+				 --paper-slider-input: {
+					 width: 4.5rem;
+					 margin-top: -1.75rem;	 
+					 --paper-input-container-input-color: var(--app-primary-color);
+				 };	
+				--paper-input-container-input-color: var(--app-primary-color);
+			}
+			paper-slider::before {
+				content: "0 - ";
+				margin-top: -1rem;
+				font-size: 1.2rem;
+				margin-left: -1.25rem;
+				font-family: Roboto, Noto, sans-serif;
+			}
+			paper-slider#preisSlider::after {
+				content: "€";
+				margin-top: -1.5rem;
+				font-size: 1.07rem;
+				margin-left: -.25rem;
+				font-family: Roboto, Noto, sans-serif;
+			}
+			paper-slider#gaesteSlider::after {
+				content: "Ps.";
+				margin-top: -1.4rem;
+				margin-left: -.6rem;
+				font-size: 1rem;
+				font-family: Roboto, Noto, sans-serif;
+			}
+
+			@media (min-width: 320px) {
+				[main-title] img {
+					margin-right: 1rem;
+					margin-left: 1rem;
+				}
+				#title {
+					top: .125rem;
+					left: calc(50vw - 75.25px);
+				}
+				#firstBar h2 {
+					font-size: 1rem;
+				}	
+				#firstBar h2 > span {
+					font-size: 1.15rem;			
+				}
+				[condensed-title] img {		
+					height: 1.5rem;
+					width: 1.5rem;
+					margin: .35rem -.25rem -.35rem -.1rem;
+				}
+				#suchLupe {			
+					width: 3.5rem;
+				}
+				#lupe {
+					width: 1.15rem;
+					height: 1.15rem;
+				}
+				#thirdBar > div {
+					width: calc(100vw - 41px - 2rem);
+				}
+				vaadin-date-picker {
+					width: 40%;
+					--paper-input-container-input: {
+						font-size: .9rem;
+					}
+				}
+			
+			@media (min-width: 360px) {
+				[main-title] img {
+					margin-right: 1.75rem;
+					margin-left: 1.75rem;
+				}
+				form#schnellsuche {
+					width: 50vw;
+				}
+				vaadin-date-picker {
+					width: 37.5%;
+					padding-right: .75rem;
+				}
+			}
+
+			@media (min-width: 480px) {		
+				app-drawer {
+					--app-drawer-content-container: {
+					width: 400px;
+					};
+				}			
+				[main-title] h1 {					
+					margin-top: 30vw;
+				}			
+				#wrapperHdrBtm {
+					margin-top: 11vw;
+				}
+				#ribbon {
+					margin: -4.5vw auto 0 auto;
+				}				
+				.fewoIcon > div > span {
+					padding: 0;
+				}
+				vaadin-date-picker {
+					padding-right: 1.25rem;
+				}
+			}
+
+			@media (min-width: 568px) {
+				app-header {
+					height: 52.5vw;
+				}
+				.tallBar {
+					height: 52.5vw;
+				}
+				.tallBar > paper-icon-button {
+					margin-top: 1.25rem;
+					padding: .55rem;
+					background: radial-gradient(var(--app-secondary-color) 45%, transparent);	
+					width: 2.35rem;
+					height: 2.35rem;
+				}
+				#bar {	
+					height: 2.5rem;
+					margin: 2.65vw 0 0 0;	
+					width: 45%;
+					left: calc(100vw - 45vw - 1.5rem);
+					display: flex;
+					justify-content: space-between;
+					border-radius: 3px;				
+					border-color: #fff;
+					box-shadow: inset 0 0 .3rem #fff, 0 0 .25rem #aaa;
+					background-color: rgba(175,200,225,0.75);
+				}
+				form#schnellsuche {
+					height: 2.5rem;
+					width: calc(45vw - 4rem);
+					margin-top: 0;
+					background-color: rgba(255,255,255,.5);		
+					border-color: #ccc;
+					border-radius: 5px;
+				}
+				paper-input {			
+					margin-top: 0;
+					font-weight: 100;
+					--paper-input-container: {
+						line-height: .9;
+						padding: 0;
+						margin: 0;
+					};
+					--paper-input-container-label: {
+						margin-top: -.65rem;
+						font-size: 1.125rem;
+						font-weight: 500;
+						letter-spacing: .3px;
+						text-align: center;
+						color: var(--app-secondary-color); 
+					};
+					--paper-input-container-label-floating: {
+						margin-top: 0;
+						font-size: .9rem;
+						padding-bottom: 0;		
+						color: var(--app-secondary-color); 
+					};
+					--paper-input-container-input: {
+						font-size: 1rem;
+						font-weight: 300;
+						margin-top: -.5rem;
+						letter-spacing: 1px;		
+						color: var(--app-secondary-color);	
+						text-align: center;
+					};
+				}
+				[main-title] img {
+					height: 2.25rem;
+					width: 2.25rem;
+					margin:.175rem 1rem 0 1rem;
+				}
+				[main-title] h1 {					
+					margin-top: 24vw;
+				}			
+				#wrapperHdrBtm {
+					margin-top: 9.6vw;
+				}
+				.rwdwn::before {
+					border-top: 7vw solid transparent;
+				}		
+				#ribbon {
+					margin: -6.5vw auto 0 auto;
+					left: calc(50vw - 121.1px);
+					padding: 9px 25px 9px 25px;
+					height: 20px;
+					font: 20px/1 'Caveat', cursive;					
+				}
+				#ribbon::before,
+				#ribbon::after {
+					position: absolute;
+					color: #045584;
+					font-size: 17px;
+					line-height: 17px;
+					top: 12px;
+					height: 0;
+					width: 22px;
+					border: 16px solid #179ccd;
+					z-index: -1;
+				}			
+				#ribbon::before {
+					content: '\25E5';
+					text-align: right;
+					left: -22px;
+					border-right-width: 0;
+					border-left-color: transparent;
+					text-indent: 4px;
+				}			
+				#ribbon::after {
+					content: '\25E4';
+					right: -22px;
+					border-left-width: 0;
+					text-indent: -4px;
+					border-right-color: transparent;
+				}		
+				div[condensed-title] {
+					height: 50px;
+				}
+				.smallBar {
+					margin-top: -52.5vw;
+					height: 50px;
+				}
+				#firstBar{
+					height: 50px;
+				}
+				paper-icon-button {
+					height: 1.75rem;
+					width: 1.75rem;
+					margin-left: 1.5rem; 	
+					margin-top: 0;			
+					padding: 6.5px;	
+					border-radius: 50%;
+					border: .5px solid aqua;
+					background: radial-gradient(var(--app-primary-color) 45%, transparent);	
+					color: #fff;	
+					box-shadow: 0 0 .75rem .1rem var(--app-primary-color), inset 0 0 1.5rem aqua;
+					line-height: .5rem;
+				}
+				#title {
+					margin-top: -.2rem;
+					left: calc(50vw - 103.5px);
+				}
+				#firstBar h2 {	
+					font-size: 1.25rem;
+				}
+				#firstBar h2 > span {
+					font-size: 1.6rem;
+				}
+				[condensed-title] img {		
+					height: 2.3rem;
+					width: 2.3rem;
+					margin: .55rem -.1rem -.55rem 0;
+				}
+				#sprachwahl {
+					height: 50px;
+					margin: .5rem 0 0 4.7rem;
+				}
+				#sprachwahl > #svg1 {
+					display: inline-block;
+					width: 1.35rem;
+					height: 1.35rem;
+				}
+				#sprachwahl > #svg2 {
+					top: 0;
+					margin-left: -.2rem;
+					height: 1rem;
+					width: 1rem;
+				}
+				#sprachwahl > p {
+					font-size: 1rem;
+					font-weight: 500;
+					margin-left: 0;
+				}	
+				.dropdown-lang {
+					top: 50px;
+					margin-top: -.5rem;
+					border-bottom: .25rem solid var(--app-secondary-color);
+				}	
+				.dropdown-lang ul {
+					height: 50px;
+				}
+				.dropdown-lang li{					
+					font-size: 1.15rem;
+				}	
+				#suchLupe {				
+					height: 50px;
+					width: 5rem;
+				}
+				#lupe {
+					width: 1.5rem;
+					height: 1.5rem;
+				}
+				paper-slider {
+					--paper-input-container-input-color: var(--app-primary-color);
+					--paper-input-container-underline: {
+						 display: none;
+						};					
+				}
+				#w100, #preisFilter {
+					top: 135px;
+				}
+				#containerNumberFilter, #numberFilter {
+					top: 211px;
+				}
+				#euro {
+					margin-top: 18.5rem;
+				}
+				#number {
+					margin-top: 28rem;
+				}				
+				#thirdBar {
+					top: 45px;
+				}
+				vaadin-date-picker {
+					padding-right: 2rem;
+				}
+				.fewoImg {
+					height: 200px;
+					width: 300px;
+				}
+			}
+
+			@media (min-width: 640px) {
+				#ribbon {
+					margin-top: -6vw;					
+				}
+				.smallBar {
+					height: 50px;
+					padding-bottom: .5rem;
+					background: #fff;
+					box-shadow: none;
+				}
+				#firstBar {
+					box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.2);
+				}
+				main > section {
+					display: flex;
+				}
+				main > section > div:first-of-type {
+					width: calc(70vw - 4.5rem);
+				    padding: 1rem 1.5rem 1rem 3rem;
+				}
+				main > section > div:last-of-type {
+					width: calc(30vw + 4.5rem);
+				}
+				main > section > div > h2 {
+				font-size: calc(1vw + 1.5rem);
+				}	
+				main > section > div:last-of-type > h2 {
+					margin-top: .5rem;
+					margin-bottom: 3rem;
+				}
+				main > section > div:last-of-type > h2:nth-of-type(2) {
+					margin-top: 5rem;
+					margin-bottom: 0;
+				}
+				.fewoImg {
+					height: 173px;
+					width: 260px;
+				}
+				#thirdBar, #kalender {
+					position: absolute;
+					left: initial;
+					top: 50px;
+					right: 0;
+					display: block;
+					width: 250px;
+					height: 190px;
+					background: #fff;
+					z-index: 0;
+				}
+				#kalender {
+					margin-top: calc(52.5vw - 50px);
+					background: none;
+				}
+				#dates, #euro, #number {
+					display: none;
+				}
+				#thirdBar > div:first-of-type, #kalender > div:first-of-type {
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					width: 85px;
+					height: 80px;
+					margin: 30px 0 .5rem 5vw;
+					padding: 2rem;
+					padding-top: 2.4rem;
+					box-shadow: 0 0 .35rem var(--app-primary-color), inset 0 0 2.25rem var(--app-primary-color), 0 0 .75rem var(--app-secondary-color);
+					border: .125rem solid var(--app-primary-color);
+					border-radius: 50%;
+				}
+				vaadin-date-picker {
+					position: relative;
+					width: 100px;
+					padding: 0 0.5rem;
+					margin-left: -.65rem;
+					margin-top: -1.25rem;
+					--paper-input-container-label: {						
+						margin-top: 7px;						
+					};
+					--paper-input-container-label-floating: {
+						margin-top: .2rem;
+						padding-bottom: .2rem;	
+						font-size: 20px;
+					};
+				}
+				vaadin-date-picker:first-of-type {
+					margin-top: -2.25rem;
+					margin-bottom: .75rem;
+				}
+				#thirdBar > div > vaadin-date-picker {
+					--paper-input-container-label-floating: {
+						margin-top: .4rem;
+					};
+				}
+				#kalender > div > vaadin-date-picker {
+					--paper-input-container-label: {						
+						margin-top: 0;
+					};
+				}
+				#w100 {
+					top: 100px;
+				}
+				#containerNumberFilter {
+					top: 130px;
+				}
+				#preisFilter, #numberFilter {
+					position: absolute;
+					right: 4.5vw;
+					width: 33vw;
+					border: none;
+					background: none;
+				}
+				#preisFilter {
+					padding-top: 1rem;
+				}
+				#numberFilter {
+					top: 10.5rem;
+				}
+				#preisFilter h3, #numberFilter h3 {
+					font-weight: 300;
+					padding-bottom: 0;
+					margin-bottom: -1.25rem;
+					border: none;
+				}
+				paper-slider {
+					display: flex;
+					width: 33vw;					
+					margin: 0 auto;
+					--paper-input-container-input-color: var(--app-primary-color);
+					 --paper-slider-input: {
+						 width: 7rem;
+						 margin-top: -1.75rem;
+						 margin-left: -.75rem;
+						 --paper-input-container-input-color: var(--app-primary-color);
+					 };					
+				}			
+				paper-slider::before {
+					content: "0 -";
+					margin-top: -1.25rem;
+					margin-right: -.25rem;
+					font-size: 1.1rem;
+					font-weight: normal;
+					font-family: Roboto, Noto, sans-serif;
+				}
+				paper-slider#preisSlider::after {
+					content: "€";
+					margin-top: -1.5rem;
+					margin-left: -1.2rem;
+					font-size: 1.1rem;
+					font-weight: normal;
+				}
+				paper-slider#gaesteSlider::after {
+					content: "Ps.";
+					font-size: 1rem;
+					margin-top: -1.4rem;
+					margin-left: -1.4rem;
+					font-weight: normal;
+				}
+			}
+			@media (min-width: 740px) {
+				#bar {	
+					width: 38%;
+					margin-top: 2.5vw;	
+					left: calc(100vw - 38vw - 2rem);						
+					box-shadow: inset 0 0 .75rem #fff, 0 0 .35rem #aaa;			
+				}
+				form#schnellsuche {
+					width: calc(38vw - 9vw - 2.3rem);
+				}
+				[main-title] img {
+					height: 9vw;
+					width: 9vw;
+					margin: -1.15vw 1.15rem 0;					
+				}
+				#ribbon {
+					margin-top: -5vw;					
+				}
+				app-drawer {
+					--app-drawer-scrim-background: -webkit-linear-gradient(125deg, rgba(13,93,163,.94) 5%, rgba(115,191,58,.94) 75%);
+					--app-drawer-content-container: {
+						width: 45%;
+					};
+				}				
+				main > section > div:first-of-type {
+				    padding-left: 5rem
+				}
+				#thirdBar, #kalender {
+					right: 1.5vw;
+					padding-top: 40px;
+				}
+				#preisFilter {
+					top: 13rem;
+					width: 30vw;
+					text-align: center;
+				}
+				#numberFilter {
+					top: 19rem;
+					width: 30vw;
+					text-align: center;
+				}
+				#preisFilter h3, #numberFilter h3 {
+					margin-bottom: -.75rem;
+					padding-right: 0;
+				}
+				paper-slider {
+					width: 30vw;	
+					--paper-slider-input: {
+						 width: 7rem;
+						 margin-top: -1.75rem;
+						 margin-left: -.4rem;
+						 --paper-input-container-color: var(--app-primary-color);
+						 --paper-input-container-input-color: var(--app-primary-color);
+					 };			
+					 --paper-input-container-underline: {
+						 display: none;
+						};
+					--paper-input-container: {
+						width: 45px;
+					};
+					--paper-input-container-color: var(--app-primary-color);
+				}
+				paper-slider#preisSlider::after {
+					margin-left: -1.4rem;
+				}
+				paper-slider#gaesteSlider::after {
+					margin-left: -1.6rem;
+				}
+				#preisFilter div, #numberFilter div {
+					display: block;
+					font-size: 1rem;
+					padding: .75rem 0 0 1rem;
+				}
+			}
+			@media (min-width: 769px) {
+				#ribbon {
+					margin-top: -4vw;					
+				}
+				#thirdBar, #kalender {
+					height: 220px;
+				}
+				paper-dialog {
+					top: 53vw;
+				}
+			}
+			@media (min-width: 850px) {
+				.fewoInfo {
+					min-height: 200px;				
+				}
+				.left {
+					float: left;
+					margin-right: 2rem;
+				}
+				.right {
+					float: right;
+					margin-left: 2rem;
+				}
+				paper-dialog {
+					top: 55vw;
+				}
+			}
+			@media (min-width: 1024px) {
+				app-header:hover {
+					--app-header-shadow: {
+						display: none;
+					};
+				}
+				.menu-icon[icon] {
+        			display: none;
+      			}
+				#bar {	
+					height: 3.5rem;
+					margin-top: 2.5vw;
+					width: 35%;	
+					left: calc(100vw - 35vw - 2.5rem);
+				}
+				form#schnellsuche {
+					height: 3.5rem;
+					width: calc(35vw - 10.5vw);
+					background-color: rgba(255,255,255,.4);
+				}
+				[main-title] img {
+					height: 8vw;
+					width: 8vw;
+					margin:-1.25vw 1.25vw 0;
+				}
+				paper-input {			
+					height: 3.5rem;
+					font-weight: 100;
+					--paper-input-container: {
+						height: 3.5rem;
+						line-height: 1.6;
+						padding: 0;
+						margin: 0;
+					};
+					--paper-input-container-label: {
+						line-height: .8;
+						padding-bottom: .5rem;
+						font-size: 1.6rem;
+						font-weight: 400;
+						letter-spacing: 1px;
+						text-align: center;
+						color: var(--app-secondary-color); 
+					};
+					--paper-input-container-label-floating: {
+						font-size: 1.2rem;
+						padding-bottom: 0;		
+						color: var(--app-secondary-color); 
+					};
+					--paper-input-container-input: {
+						font-size: 1.3rem;
+						font-weight: 300;
+						margin-bottom: 0;
+						padding-left: 1rem;	
+						width: calc(100% - 2rem);
+						padding-bottom: .125rem;
+						letter-spacing: 1px;		
+						color: var(--app-secondary-color);	
+					};
+					--paper-input-container-underline-focus: {
+						height: 3px;
+					};	
+				}
+				#ribbon {
+					margin-top: -4.7vw;
+					left: calc(50vw - 147px);
+					height: 25px;
+					font-size: 25px;
+					padding: 14px 30px 14px 30px;
+				}		
+				#ribbon::before,
+				#ribbon::after {
+					position: absolute;
+					color: #045584;
+					font-size: 22px;
+					line-height: 22px;
+					top: 16px;
+					height: 0;
+					width: 22px;
+					border: 22px solid #179ccd;
+					z-index: -1;
+				}			
+				#ribbon::before {
+					content: '\25E5';
+					text-align: right;
+					left: -24px;
+					border-right-width: 0;
+					border-left-color: transparent;
+					text-indent: 3px;
+				}			
+				#ribbon::after {
+					content: '\25E4';
+					right: -24px;
+					border-left-width: 0;
+					text-indent: -3px;
+					border-right-color: transparent;
+				}		
+				.smallBar {
+					position: relative;
+					margin-top: -750px;
+					width: 100%;
+					height: 140px; 
+					padding: 0;
+				}				
+				#firstBar {				
+					height: 60px;
+				}	
+				#suchLupe {
+					order: 1;
+					height: 60px;
+					width: 6rem;
+					background-color: #16cfde;
+				}
+				#lupe {
+					height: 1.7rem;
+					width: 1.7rem;
+				}
+				#logoImage{
+					display: block;
+					position: relative;
+					width: 7.35rem;
+					height: 7.35rem;
+					top: 2.5rem;
+					left: -1.25rem;
+					border-radius: 50%;
+					border-right: .75rem solid var(--app-primary-color);
+					border-left: .75rem solid var(--app-primary-color);
+					background: radial-gradient(var(--app-secondary-color) 43%, var(--app-primary-color), aqua);
+					order: 3;
+					z-index: 2;
+				}
+				#logoImage img {
+					margin-top: -.4rem;
+					margin-left: .2rem;
+					width: 7.15rem;
+					height: 7.15rem;
+					transform: rotate(.4deg);
+					z-index: 1;
+				}
+				#title {
+					position: relative;
+					left: 0;
+					margin-top: -.75rem;
+					order: 2;
+				}
+				[condensed-title] img {
+					height: 2.4rem;
+					width: 2.4rem;
+					margin: .65rem -1rem -.65rem 0;
+				}
+				#firstBar > span > h2 {	
+					font-size: 1.35rem;
+				}
+				#firstBar > span > h2 > span {
+					font-size: 1.6rem;
+				}
+				[condensed-title] img {		
+					margin-right: 0;
+				}
+				#firstBar > a {				
+					display: inline;
+					margin-right: 2rem;
+					color: #fff;
+					font: 100 1.3rem/1 sans-serif;
+					order: 4;
+				}
+				#sprachwahl {
+					position: relative;
+					width: 9rem;
+					order: 5;
+					height: 60px;
+					margin: 0;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					background-color: var(--app-primary-color);
+				}
+				#sprachwahl > #svg1 {
+					width: 1.75rem;
+					height: 1.75rem;
+				}
+				#sprachwahl > #svg1 * {
+					fill: #fff;
+				}
+				#sprachwahl > p {
+					color: #fff;
+					margin-left: .7rem;
+					font-size: 1.25rem;
+					top: 0;
+				}
+				#sprachwahl > #svg2 {
+					margin-left: .2rem;
+					width: 1.5rem;
+					height: 1.5rem;
+				}
+				#dropdown {
+					fill: #ccd; 
+				}
+				#sprachwahl:hover #dropdown {
+					fill: #fff;
+				}
+				.dropdown-lang {
+					right: initial;
+					left: 0;
+					margin: 0;
+					margin-top: .65rem;
+					width: 9rem;
+				}
+				.dropdown-lang ul {
+					height: 60px;
+				}
+				.dropdown-lang li{
+					font-size: 1.35rem;
+					font-weight: bold;
+					padding: 0 2.7rem;
+					line-height: 4;
+				}
+				#secondBar {
+					display: block;
+					margin-top: 60px;
+					height: 80px;
+					width: 100%;			
+					background-color: #fff;
+					box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.2);
+					z-index: 1;
+				}
+				#headLi {
+					height: 80px;
+					width: 100%;
+					display: flex;
+					justify-content: space-around;
+					font-size: 1.2rem;
+					font-weight: 500;
+					letter-spacing: 1px;
+					text-transform: uppercase;
+					color: var(--app-secondary-color);
+				}	
+				#headLi > span {
+					height: 80px;
+					width: 30vw;
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+				}
+				#headLi > span:first-of-type {
+					margin-right: 5vw;
+				}
+				#headLi > span:last-of-type {
+					margin-left: 7vw;
+				}
+				#headLi > span > li:hover {
+					color: var(--app-primary-color);
+				}
+				#europaList, #weltList {
+					position: absolute;
+					width: 1.5rem;
+					height: 1.5rem;
+				}
+				#headLi > span > li:nth-of-type(2):hover > div {
+					display: block;
+				}
+				#listEU, #listWelt {
+					display: none;
+					position: absolute;
+					color: #fff;
+					margin-top: 26px;
+					width: 450px;
+					z-index: 1;
+				}
+				#listWelt {
+					width: 400px;
+				}
+				#listEU > ul > li, #listWelt > ul > li {
+					display: block;
+					padding: 1rem 0;
+					padding-bottom: .25rem;
+					border-bottom: 2px solid var(--app-secondary-color);
+					background: rgba(0,0,0,.85);
+				}
+				#listEU > ul > li:hover, #listWelt > ul > li:hover {
+					background: #fff;
+					color: var(--app-primary-color);
+				}
+				#listEU > ul > li:hover > span > ul > li, #listWelt > ul > li:hover > span > ul > li {
+					color: #000;
+				}
+				#listEU > ul > li:nth-of-type(10), #listWelt > ul > li:nth-of-type(6) {
+					margin-bottom: 0;
+					border-bottom: 4px solid var(--app-secondary-color);
+				}
+				#listEU > ul > li:last-of-type, #listWelt > ul > li:last-of-type {
+					background: none;
+					border: none;
+					height: 11rem;
+				}
+				#listEU > ul > li > a, #listEU > ul > li > span, #listWelt > ul > li > a, #listWelt > ul > li > span {
+					padding: 0 5rem 0 1.5rem;
+				}
+				#listEU > ul > li > span > ul, #listWelt > ul > li > span > ul {
+					display: none;
+				}
+				#listEU > ul > li.ul > span > div:hover ~ ul, #listEU > ul > li.ul > span > ul:hover, #listWelt > ul > li.ul > span > div:hover ~ ul,  #listWelt > ul > li.ul > span > ul:hover {
+					display: block;
+				}
+				#listEU > ul > li.ul > span > div, #listWelt > ul > li.ul > span > div {
+					position: absolute;
+					left: calc(100% - 3rem);
+					margin-top: -2.25rem;
+					margin-bottom: -2.25rem;
+					font-size: 3rem;
+					color: var(--app-primary-color);
+					padding: 0 .75rem .25rem .25rem;
+				}
+				#listEU > ul > li > span > ul > li, #listWelt > ul > li > span > ul > li {
+					display: block;
+					padding: .75rem 2rem 0 3.5rem;
+				}
+				#listEU > ul > li > span > ul > li:hover, #listWelt > ul > li > span > ul > li:hover {
+					color: var(--app-primary-color)
+				}
+				#dropLi{
+					display: none;	
+					height: 24rem;
+					width: 100%;
+					position: relative;
+					overflow: hidden;
+					z-index: 1;		
+					background-color: #fff;	
+    				box-shadow: 0px 8px 8px 0px rgba(0,0,0,0.2);
+				}
+				#dropLi > input {
+					display: none;
+				}
+				#dropLi > #span-one:checked ~ ul > span:nth-of-type(1) {
+					margin-left: 0;
+				}
+				#dropLi > #span-two:checked ~ ul > span:nth-of-type(1) {
+					margin-left: -100vw;
+				}
+				#dropLi > #span-three:checked ~ ul > span:nth-of-type(1) {
+					margin-left: -200vw;
+				}
+				#dropLi > div {
+					position: absolute;
+					height: 100%;
+				}
+				#dropLi > div > label {
+					display: none;			
+					position: relative;		
+					color: lightgrey;
+					font-size: 8rem;
+					padding: 7rem 0 3rem 0;
+				}
+				#dropLi > div > label:hover {
+					color: lightblue;
+				}
+				#dropLi > div.left {
+					left: 2rem;
+				}
+				#dropLi > div.right {
+					left: calc(100% - 5rem);
+				}
+				#span-one:checked ~ div > label:nth-of-type(1),
+				#span-one:checked ~ div > label:nth-of-type(4),
+				#span-two:checked ~ div > label:nth-of-type(2),
+				#span-two:checked ~ div > label:nth-of-type(5),
+				#span-three:checked ~ div > label:nth-of-type(3),
+				#span-three:checked ~ div > label:nth-of-type(6)
+				 {
+					display: block;
+				}
+ 				#dropLiUl {	
+					width: 3072px;
+					margin-left: 37px;
+					display: flex;
+					flex-flow: row nowrap;
+				}
+				#dropLiUl > span {
+					height: 23rem;
+					margin-bottom: 1rem;
+					width: calc(1024px - 148px);
+					position: relative;
+					display: flex;	
+					flex-flow: row nowrap;
+					justify-content: space-around;
+					transition: all 0.7s cubic-bezier(0.4, 1.3, 0.7, 1);	
+				}
+				#dropLiUl > span:nth-of-type(1) {
+					left: 37px;
+				}
+				#dropLiUl > span:nth-of-type(2) {
+					left: calc(148px + 37px);
+				}
+				#dropLiUl > span:nth-of-type(3) {
+					left: calc(2*148px + 37px);
+				}
+				#dropLiUl span > li {
+					display: flex;
+					flex-direction: column;
+					justify-content: flex-end;
+					align-items: center;
+					font-size: 1.3rem;
+					margin-bottom: 1rem;
+				}
+				#dropLiUl li > * {
+					line-height: 1.35;	
+					font-weight: 300;
+				}
+				#dropLiUl li >  h4 span {
+					display: block;
+					text-align: center;
+					font-size: 1.15rem;
+				}
+				#dropLiUl a {
+					width: 200px;
+					height: 200px;
+					border-radius: 50%;
+					border: .5rem double var(--app-primary-color);
+					overflow: hidden;
+					position: relative;
+				}
+				#dropLiUl img {
+					transform: none;
+					margin: auto;
+					width: auto;
+					height: 100%;
+				}
+				#thirdBar {
+					top: 140px;
+					right: 5vw;
+					margin-top: 0;
+				}
+				#kalender {
+					top: 140px;
+					margin-top: calc(52.5vw - 140px);
+					right: 5vw;
+				}
+				#preisFilter {
+					top: 19rem;
+					right: 4.5vw;
+					width: 25vw;
+				}
+				#numberFilter {
+					top: 26.25rem;
+					right: 4.5vw;
+					width: 25vw;
+				}
+				paper-slider {
+					width: 25vw;
+				}
+				paper-slider#preisSlider::after {
+					margin-left: -2.5rem;
+					font-size: 1.2rem;
+				}
+				paper-slider#gaesteSlider::after {
+					font-size: 1rem;
+					margin-left: -2.75rem;
+					margin-top: -1.3rem;
+				}
+				#mcPm {
+					font-size: 1.2rem;
+				}
+				.fewoTitle {
+					margin-top: 2.25rem;
+				}
+				.fewoImg {
+					height: 153px;
+					width: 230px;
+				}	
+			}
+			@media (min-width: 1025px) {		
+				.largeOnly {
+					display: block;
+				}		
+				paper-input {
+					--paper-input-container: {
+						height: 3.5rem;
+						line-height: 1.7;
+						padding: 0;
+						margin: 0;
+					};
+					--paper-input-container-underline-focus: {
+						height: 4px;
+					};		
+				}
+				#logoImage{
+					width: 8.5rem;
+					height: 8.5rem;
+					top: 2.6rem;
+					left: -.25rem;
+				}
+				#logoImage img {
+					margin-top: -.2rem;
+					margin-left: 0;
+					width: 8.75rem;
+					height: 8.75rem;
+				}
+				#dropLi{
+					height: 23rem;
+				}
+				#dropLi > div > label {
+					padding: 6.5rem 0;
+				}
+				#dropLiUl {	
+					width: 300%;
+				}
+				#dropLiUl > span {
+					height: 22rem;
+					width: calc(33.33% - 148px);
+				}
+				#dropLiUl > span:nth-of-type(1) {
+					left: 37px;
+				}
+				#dropLiUl > span:nth-of-type(2) {
+					left: calc(148px + 55px);
+				}
+				#dropLiUl > span:nth-of-type(3) {
+					left: calc(2*148px + 74px);
+				}	
+				main > section > div:first-of-type {
+					flex: 2;
+				    padding: 1rem 4rem 1rem 9vw;
+				}
+				#thirdBar, #kalender {
+					width: 300px;
+					height: 250px;
+					right: 3.5vw;
+				}
+				#thirdBar > div:first-of-type, #kalender > div:first-of-type {
+					width: 140px;
+					height: 140px;
+					margin-left: 3rem;
+				}
+				vaadin-date-picker {
+					width: 140px;
+				}
+				#preisFilter {
+					top: 20.75rem;
+					right: 5.75vw;
+				}
+				#numberFilter {
+					top: 26.75rem;
+					right: 5.75vw;
+				}
+				paper-slider#preisSlider::after {
+					margin-left: -2.85rem;
+				}
+				paper-slider#gaesteSlider::after {
+					margin-left: -3rem;
+					margin-top: -1.4rem;
+				}
+			}
+			@media (min-width: 1025px) and (max-height: 800px) {
+				app-header, .tallBar {
+					height: 575px;
+				}
+				app-header {
+					--app-header-background-front-layer: {
+						background-image: url(../images/Auswahl.jpg);
+						background-position: left 35%;
+						background-repeat: no-repeat;
+						background-color: #fff;
+						-webkit-backdrop-filter: saturate(150%);
+						backdrop-filter: saturate(150%);
+						z-index: -1;
+					};			
+				}
+				[main-title] h1 {
+					font-size: 125px;
+					margin-top: 250px;
+				}
+				#wrapperHdrBtm {
+					margin-top: 100px;
+				}
+				#ribbon {
+					margin-top: -51px;
+					}
+				.smallBar {
+					margin-top: -575px;
+				}
+				#kalender {
+					margin-top: calc(575px - 140px);
+				}
+			}
+			@media (min-width: 1180px) {
+				.fewoCont {
+					margin-bottom: 1.5rem;
+				}
+				.fewoImg {
+					height: 173px;
+					width: 260px;
+				}
+				#thirdBar, #kalender {
+					right: 4.5vw;
+				}
+				#thirdBar > div:first-of-type, #kalender > div:first-of-type {
+					margin-left: 1vw;
+				}
+			}
+			@media (min-width: 1366px) {
+				#wrapper {
+					width: 1366px;
+					min-height: 100vh;
+					margin: 0 auto;
+					box-shadow: 0 0 38px rgba(0,0,0,0.30), 0 0 12px rgba(0,0,0,0.22);
+				}								
+				app-header, .tallBar,.rwdwn  {
+					width: 1366px;
+					margin: 0 auto;
+				}	
+				app-header, .tallBar {
+					height: 750px;			
+				}
+				#bar {				
+					width: 470px;	
+					left: calc(1366px - 470px - 2rem);
+				}
+				form#schnellsuche {
+					width: 327px;
+				}
+				[main-title] img {
+					height: 109px;
+					width: 109px;
+					margin:-17px 17px 0;
+				}
+				[main-title] h1 {
+					font-size: 135px;
+					margin-top: 366px;
+				}
+				#wrapperHdrBtm {
+					margin-top: 124px;
+				}
+				.rwdwn::before {
+					border-left: 683px solid #fff;
+					border-right: 684px solid #fff;
+					border-top: 95px solid transparent;
+				}			
+				#ribbon {
+					margin-top: -50px;
+					left: calc(683px - 125px);
+				}	
+				#firstBar > span > h2 {
+					font-size: 1.5rem;
+				}
+				#firstBar > span > h2 > span {
+					font-size: 1.9rem;
+				}
+				#headLi > span {
+					width: 341.5px;
+				}
+				#headLi > span:first-of-type {
+					margin-right: 68.3px;
+				}
+				#headLi > span:last-of-type {
+					margin-left: 68.3px;
+				}
+				#dropLi > #span-two:checked ~ ul > span:nth-of-type(1) {
+					margin-left: -1366px;
+				}
+				#dropLi > #span-three:checked ~ ul > span:nth-of-type(1) {
+					margin-left: -2732px;
+				}
+				#dropLiUl {	
+					width: 4098px;
+				}
+				#dropLiUl > span {
+					width: calc(1366px - 148px);	
+				}
+				#dropLiUl > span:nth-of-type(2) {
+					left: calc(148px + 37px);
+				}
+				#dropLiUl > span:nth-of-type(3) {
+					left: calc(2*148px + 37px);
+				}
+				#thirdBar, #kalender {
+					right: 95px;
+					height: 275px;
+				}
+				#kalender {
+					margin-top: calc(750px - 140px);
+				}
+				#kalender > div:first-of-type {
+					margin-top: 50px;
+				}
+				main > section > div:first-of-type {
+				    padding-left: 150px;
+				}
+				main > section > div > h2 {
+				font-size: 45px;
+				}	
+				#preisFilter, #numberFilter {
+					right: auto;
+					left: calc(1366px * 2/3);
+					margin-left: 0;
+					width: 375px;
+				}
+				#preisFilter h3, #numberFilter h3 {
+					font-size: 1.3rem;
+					letter-spacing: 1px;
+				}
+				#preisFilter div, #numberFilter div {
+					font-size: 1.15rem;
+					padding-bottom: .7rem;
+				}
+				paper-slider {
+					width: 375px;
+				}
+
+				paper-slider#preisSlider::after {
+					margin-left: -3.5rem;
+				}
+				paper-slider#gaesteSlider::after {
+					margin-left: -3.6rem;
+				}
+				paper-dialog {
+					top: 450px;
+				}			
+				main {
+					min-height: 100vh;
+				}
+			}
+
+			@media (min-width: 1366px) and (max-height: 768px) {
+				app-header, .tallBar {
+					height: 575px;
+				}
+				app-header {
+					--app-header-background-front-layer: {
+						background-image: url(../images/Auswahl.jpg);
+						background-position: left 35%;
+						background-repeat: no-repeat;
+						background-color: #fff;
+						-webkit-backdrop-filter: saturate(150%);
+						backdrop-filter: saturate(150%);
+						z-index: -1;
+					};			
+				}
+				[main-title] h1 {
+					font-size: 125px;
+					margin-top: 250px;
+				}
+				#wrapperHdrBtm {
+					margin-top: 85px;
+				}
+				.smallBar {
+					margin-top: -575px;
+				}
+				#kalender {
+					margin-top: calc(575px - 140px);
+				}
+			}
+
+		</style>
+
+		<iron-media-query query="max-width: 1024px" query-matches="{{smallScreen}}"></iron-media-query>
+		<iron-ajax url="../data/fewoDE.json" last-response="{{data}}" auto=""></iron-ajax>
+		<app-drawer-layout drawer-width="300px" fullbleed="" force-narrow="">		
+			<app-drawer swipe-open="" opened="false">
+				<div class="drawer-contents">
+				  <template is="dom-if" if="[[smallScreen]]">				
+					<div class="chance-container">
+						<div class="image"></div>
+					</div>
+					<div class="contact-info">
+						<h2 class="name"><span class="initial-letter">G</span>astgeber<span class="initial-letter">N</span>et</h2>
+						<hr>
+						<h3 class="intro">Verzeichnis für Ferienwohnungen und Ferienhäuser weltweit</h3>
+					</div>
+					<div class="drwrbtm">
+						<nav>
+							<ul>	
+								<li class="line">
+									<input type="radio" id="select-deutschland" name="selector">
+									<label for="select-deutschland" tabindex="0">Deutschland</label>
+									<ul class="content">
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=15">Schleswig-Holstein</a>
+										</li>
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=2">Bayern</a>
+										</li>
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=1">Niedersachsen</a>
+										</li>
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=8">Brandenburg &amp; Mecklenburg-Vorpommern</a>
+										</li>	
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=1">Baden-Württemberg</a>
+										</li>
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=3">Hamburg &amp; Berlin</a>
+										</li>
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=11">Hessen, Rheinland-Pfalz &amp; Saarland</a>
+										</li>
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=10">Nordrhein-Westfalen</a>
+										</li>
+										<li>
+											<a href="http://gastgeber.net/Regionen.asp?Bland=13">Sachsen, Sachsen-Anhalt &amp; Thüringen</a>
+										</li>
+									</ul>
+								</li>
+								<li class="line">
+									<input type="radio" id="select-europa" name="selector">
+									<label for="select-europa" tabindex="0">Europa</label>
+									<ul class="content">
+										<li><div on-tap="openSub" tabindex="23">Benelux</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Belgien">Belgien</a></li>
+												<li><a href="http://www.gastgeber.net/Niederlande">Niederlande</a></li>
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="16">Alpen</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Oesterreich">Österreich</a></li>
+												<li><a href="http://www.gastgeber.net/Schweiz">Schweiz</a></li>
+												<li><a href="http://www.gastgeber.net/Slowenien">Slowenien</a></li>
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="19">Britische Inseln</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/England">England</a></li>
+												<li><a href="http://www.gastgeber.net/Schottland">Schottland</a></li>
+												<li><a href="http://www.gastgeber.net/Wales">Wales</a></li>
+												<li><a href="http://www.gastgeber.net/Nordirland">Nordirland</a></li>
+												<li><a href="http://www.gastgeber.net/Irland">Irland</a></li>
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="18">Skandinavien &amp; Island</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Norwegen">Norwegen</a></li>
+												<li><a href="http://www.gastgeber.net/Schweden">Schweden</a></li>
+												<li><a href="http://www.gastgeber.net/Daenemark">Dänemark</a></li>
+												<li><a href="http://www.gastgeber.net/Island">Island</a></li>
+											</ul>
+										</li>
+										<li><a href="http://gastgeber.net/Frankreich" tabindex="24">Frankreich</a></li>
+										<li><a href="http://gastgeber.net/Italien" tabindex="25">Italien</a></li>
+										<li><div on-tap="openSub" tabindex="17">Westliches Mittelmeer</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Spanien">Spanien</a></li>
+												<li><a href="http://www.gastgeber.net/Portugal">Portugal</a></li>
+												<li><a href="http://www.gastgeber.net/Malta">Malta</a></li>			
+											</ul>
+										</li>	
+										<li><div on-tap="openSub" tabindex="21">Östliches Mittelmeer</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Griechenland">Griechenland</a></li>
+												<li><a href="http://www.gastgeber.net/Kroatien">Kroatien</a></li>
+												<li><a href="http://www.gastgeber.net/Tuerkei">Türkei</a></li>
+												<li><a href="http://www.gastgeber.net/Zypern">Zypern</a></li>
+											</ul>											
+										</li>
+										<li><div on-tap="openSub" tabindex="20">Ost- &amp; Südosteuropa</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Tschechien">Tschechien</a></li>
+												<li><a href="http://www.gastgeber.net/Ungarn">Ungarn</a></li>
+												<li><a href="http://www.gastgeber.net/Bulgarien">Bulgarien</a></li>
+												<li><a href="http://www.gastgeber.net/Mazedonen">Mazedonen</a></li>
+												<li><a href="http://www.gastgeber.net/Ukraine">Ukraine</a></li>
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="22">Nordosteuropa</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Polen">Polen</a></li>
+												<li><a href="http://www.gastgeber.net/Estland">Estland</a></li>
+												<li><a href="http://www.gastgeber.net/Lettland">Lettland</a></li>
+												<li><a href="http://www.gastgeber.net/Litauen">Litauen</a></li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+								<li class="line">
+									<input type="radio" id="select-weltweit" name="selector">
+									<label for="select-weltweit" tabindex="0">weltweit</label>
+									<ul class="content">
+										<li><div on-tap="openSub" tabindex="25">Asien</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/China">China</a></li>
+												<li><a href="http://www.gastgeber.net/Indien">Indien</a></li>
+												<li><a href="http://www.gastgeber.net/Indonesien">Indonesien</a></li>
+												<li><a href="http://www.gastgeber.net/Kambodscha">Kambodscha</a></li>
+												<li><a href="http://www.gastgeber.net/Malaysien">Malaysien</a></li>
+												<li><a href="http://www.gastgeber.net/Philippinen">Philippinen</a></li>
+												<li><a href="http://www.gastgeber.net/Russland">Russland</a></li>
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="26">Ozeanien</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Australien">Australien</a></li>
+												<li><a href="http://www.gastgeber.net/Neuseeland">Neuseeland</a></li>
+												<li><a href="http://www.gastgeber.net/Sued-Pazifik">Süd-Pazifik</a></li>			
+											</ul>
+										</li>	
+										<li><div on-tap="openSub" tabindex="27">Afrika</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Aegypten">Ägypten</a></li>
+												<li><a href="http://www.gastgeber.net/Kenia">Kenia</a></li>
+												<li><a href="http://www.gastgeber.net/Suedafrika">Südafrika</a></li>
+												<li><a href="http://www.gastgeber.net/Marokko">Marokko</a></li>
+												<li><a href="http://www.gastgeber.net/Namibia">Namibia</a></li>
+												<li><a href="http://www.gastgeber.net/Simbabwe">Simbabwe</a></li>		
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="28">Mittel- &amp; Südamerika</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/Brasilien">Brasilien</a></li>
+												<li><a href="http://www.gastgeber.net/Argentinien">Argentinien</a></li>
+												<li><a href="http://www.gastgeber.net/Costa_Rica">Costa Rica</a></li>
+												<li><a href="http://www.gastgeber.net/Karibik">Karibik</a></li>
+												<li><a href="http://www.gastgeber.net/Paraguay">Paraguay</a></li>
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="29">Nordamerika</div>
+											<ul>
+												<li><a href="http://www.gastgeber.net/USA">USA</a></li>
+												<li><a href="http://www.gastgeber.net/Kanada">Kanada</a></li>		
+												<li><a href="http://www.gastgeber.net/Mexico">Mexiko</a></li>
+											</ul>
+										</li>
+										<li><div on-tap="openSub" tabindex="30">Mittlerer Osten</div>								
+											<ul>
+												<li><a href="http://www.gastgeber.net/Israel">Israel</a></li>
+											</ul>
+										</li>
+									</ul>
+								</li>							
+								<li class="line">
+									<input type="radio" id="select-lastminute" name="selector">
+									<label for="select-lastminute" tabindex="3"><a href="http://www.gastgeber.net/Last-Minute.asp">Last-Minute-Angebote</a></label>
+								</li>
+								<li class="line">
+									<input type="radio" id="select-sonderangebote" name="selector">
+									<label for="select-sonderangebote" tabindex="4"><a href="http://www.gastgeber.net/Sonderpreis.asp">Sonderangebote</a></label>
+								</li>				
+								<li class="line">
+									<input type="radio" id="select-anmelden" name="selector">
+									<label for="select-anmelden" tabindex="5"><a href="http://www.gastgeber.net/asps/eing/1_Eingabe.asp">Als Vermieter anmelden</a></label>
+								</li>
+								<li class="line">
+									<input type="radio" id="select-english" name="selector">
+									<label for="select-english" tabindex="6"><a href="http://www.accommodation.de">English</a></label>
+								</li>
+							</ul>
+						</nav>			
+					</div>					
+				  </template>
+ 				</div>
+			</app-drawer>
+			<div id="wrapper">
+				<app-header-layout>
+					<app-header condenses="" fixed="" effects="resize-snapped-title blend-background parallax-background" effects-config="{&quot;resize-snapped-title&quot;: {&quot;startsAt&quot;: 0.99, &quot;endsAt&quot;: 1}, &quot;blend-background&quot;: {&quot;startsAt&quot;: 0.99, &quot;endsAt&quot;: 1}}">
+						<app-toolbar main-title="" class="tallBar">
+							<paper-icon-button class="menu-icon" icon="gastgeber-icons:menu" drawer-toggle=""></paper-icon-button>
+							<div id="bar">								
+								<div>
+									<form id="schnellsuche" on-keypress="checkEnter" action="https://eu.httpbin.org/get" type="get">	
+										<paper-input id="input" on-dblclick="submit" name="name" label="Wohin geht's?" value="{{anfrage}}" auto-validate="" prevent-invalid-input="" allowed-pattern="[a-zA-Z\s\.äöüß-]" maxlength="50" required=""></paper-input>		
+										<input name="eingabe" value="[[anfrage]]" hidden="">
+									</form>
+								</div>		
+								<div>
+									<img src="../images/globus.png" alt="Logo weltweite Suche" on-tap="submit">
+								</div>
+							</div>
+							<h1>Sie haben die Wahl.</h1>
+							<div id="wrapperHdrBtm">
+								<div class="rwdwn"></div>
+								<div id="ribbon">Mit Ihrem GastgeberNet</div>
+							</div>						
+						</app-toolbar>
+						<app-toolbar sticky="" condensed-title="" class="smallBar">			
+							<div id="firstBar" on-mouseover="unhoverAll">
+								<paper-icon-button class="menu-icon" icon="gastgeber-icons:menu" drawer-toggle=""></paper-icon-button>
+								<span id="sprachwahl">
+									<svg id="svg1" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+										<title>Sprachauswahl</title>
+										<defs></defs>
+										<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+											<g fill="#19b3ec">
+												<path d="M7.41421356,9 L8.29055233,8.12366123 C9.26057586,7.1536377 9.9996249,5.37060807 9.99999986,4 L12,4 L12,2 L7,2 L7,0 L5,0 L5,2 L0,2 L0,4 L7.99999973,4 C7.99956262,4.84020479 7.4713745,6.11441194 6.87633877,6.70944767 L6,7.58578644 L5.12366123,6.70944767 C4.94063656,6.526423 4.76393628,6.27914249 4.6069729,6 L2.40706289,6 L2.40706289,6 C2.71635745,6.81752931 3.17827325,7.59248681 3.70944767,8.12366123 L4.58578644,9 L1.29289322,12.2928932 L2.70710678,13.7071068 L6,10.4142136 L8.81934895,13.2335625 L9.65123928,11.2370257 L7.41421356,9 L7.41421356,9 Z M11.25,17 L10,20 L8,20 L13,8 L14,8 L15,8 L20,20 L18,20 L16.75,17 L11.25,17 L11.25,17 Z M12.0833333,15 L14,10.4 L15.9166667,15 L12.0833333,15 L12.0833333,15 Z"></path>
+											</g>
+										</g>
+									</svg>
+									<p>DE</p>
+									<div class="dropdown-lang">
+										<ul>
+											<li><a href="http://www.accommodation.de">English</a></li>
+										</ul>
+									</div>
+									<svg id="svg2" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+										<title>Sprachwahl ausklappen</title>
+										<defs></defs>
+										<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+											<g id="dropdown" fill="#19b3ec">
+												<polygon points="9.29289322 12.9497475 10 13.6568542 15.6568542 8 14.2426407 6.58578644 10 10.8284271 5.75735931 6.58578644 4.34314575 8"></polygon>
+											</g>
+										</g>
+									</svg>
+								</span>
+								<span id="title">
+									<h2><span>G</span>astgeber</h2>
+									<img class="tlbrimg" src="../images/globus.png" alt="Logo weltweite Suche" on-tap="top">
+									<h2><span>N</span>et</h2>
+								</span>
+								<div id="logoImage">
+									<img src="/images/chancy.png">
+								</div>								
+								<a href="http://gastgeber.net/asps/eing/1_Eingabe.asp">Anmelden</a>
+								<div id="suchLupe" on-tap="top">
+									<svg id="lupe" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+										<title>Schnellsuche</title>
+										<defs></defs>
+										<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+											<g id="suchIcon" fill="#fff">
+												<path d="M11.1921711,12.6063847 C10.0235906,13.4815965 8.5723351,14 7,14 C3.13400675,14 0,10.8659932 0,7 C0,3.13400675 3.13400675,0 7,0 C10.8659932,0 14,3.13400675 14,7 C14,8.5723351 13.4815965,10.0235906 12.6063847,11.1921711 L14.0162265,12.6020129 C14.6819842,12.4223519 15.4217116,12.5932845 15.9484049,13.1199778 L18.7795171,15.95109 C19.5598243,16.7313971 19.5646685,17.9916807 18.7781746,18.7781746 C17.997126,19.5592232 16.736965,19.5653921 15.95109,18.7795171 L13.1199778,15.9484049 C12.5960188,15.4244459 12.4217025,14.6840739 12.6018353,14.0160489 L11.1921711,12.6063847 Z M7,12 C9.76142375,12 12,9.76142375 12,7 C12,4.23857625 9.76142375,2 7,2 C4.23857625,2 2,4.23857625 2,7 C2,9.76142375 4.23857625,12 7,12 Z"></path>
+											</g>
+										</g>
+									</svg>
+								</div>
+							</div>	
+								<div id="secondBar">							
+									<nav>
+										<ul id="headLi">						
+											<span>
+												<li on-mouseover="dropdownDE" on-tap="dropdownDE">
+													<span>Deutschland</span>
+												</li>
+												<li on-mouseover="dropdownEU" on-tap="dropdownEU">
+													<span>Europa</span>
+													<svg id="europaList" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+														<title>Menü Länderauswahl Europa ausklappen</title>
+														<defs></defs>
+														<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+															<g id="europaListIcon" fill="#19b3ec">
+																<polygon points="9.29289322 12.9497475 10 13.6568542 15.6568542 8 14.2426407 6.58578644 10 10.8284271 5.75735931 6.58578644 4.34314575 8"></polygon>
+															</g>
+														</g>
+													</svg>
+													<div id="listEU" on-mouseleave="unhoverEU">
+														<ul>
+															<li class="ul">
+																<span>Benelux<div>ˇ</div>
+																	<ul>
+																		<li>Belgien</li>
+																		<li>Niederlande</li>
+																	</ul>
+																</span>
+															</li>
+															<li class="ul">
+																<span>Alpen<div>ˇ</div>
+																	<ul>
+																		<li>Österreich</li>
+																		<li>Schweiz</li>
+																		<li>Slowenien</li>
+																	</ul>
+																</span>
+															</li>
+															<li class="ul">
+																<span>Britische Inseln<div>ˇ</div>
+																	<ul>
+																		<li>England</li>
+																		<li>Schottland</li>
+																		<li>Wales</li>
+																		<li>Nordirland</li>
+																		<li>Irland</li>															
+																	</ul>
+																</span>
+															</li>
+															<li class="ul">
+																<span>Skandinavien und Island<div>ˇ</div>
+																	<ul>
+																		<li>Norwegen</li>
+																		<li>Schweden</li>
+																		<li>Dänemark</li>
+																		<li>Island</li>			
+																	</ul>
+																</span>
+															</li>
+															<li><a href="http://gastgeber.net/Frankreich">Frankreich</a></li>
+															<li><a href="http://gastgeber.net/Italien">Italien</a></li>
+															<li class="ul">
+																<span>Westliches Mittelmeer<div>ˇ</div>
+																	<ul>
+																		<li>Spanien</li>
+																		<li>Portugal</li>
+																		<li>Malta</li>															
+																	</ul>
+																</span>
+															</li>
+															<li class="ul">
+																<span>Östliches Mittelmeer<div>ˇ</div>
+																	<ul>
+																		<li>Griechenland</li>
+																		<li>Kroatien</li>
+																		<li>Türkei</li>
+																		<li>Zypern</li>
+																	</ul>
+																</span>
+															</li>
+															<li class="ul">
+																<span>Ost- und Südosteuropa<div>ˇ</div>
+																	<ul>
+																		<li>Tschechien</li>
+																		<li>Ungarn</li>
+																		<li>Bulgarien</li>
+																		<li>Mazedonen</li>
+																		<li>Ukraine</li>
+																	</ul>
+																</span>
+															</li>
+															<li class="ul">
+																<span>Nordosteuropa<div>ˇ</div>
+																	<ul>
+																		<li>Polen</li>
+																		<li>Estland</li>
+																		<li>Lettland</li>
+																		<li>Litauen</li>
+																	</ul>
+																</span>
+															</li>
+															<li></li>
+														</ul>
+													</div>
+												</li>
+											</span>
+											<span>
+												<li on-mouseover="dropdownWelt" on-tap="dropdownWelt">
+													<span>weltweit</span>
+													<svg id="weltList" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+														<title>Menü Länderauswahl weltweit ausklappen</title>
+														<defs></defs>
+														<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+															<g fill="#19b3ec">
+																<polygon points="9.29289322 12.9497475 10 13.6568542 15.6568542 8 14.2426407 6.58578644 10 10.8284271 5.75735931 6.58578644 4.34314575 8"></polygon>
+															</g>
+														</g>
+													</svg>
+													<div id="listWelt" on-mouseleave="unhoverWelt">
+														<ul>
+															
+															<li class="ul">
+																<span>Mittel- &amp; Südamerika<div>ˇ</div>
+																	<ul>
+																		<li>Brasilien</li>
+																		<li>Argentinien</li>
+																		<li>Costa Rica</li>
+																		<li>Karibik</li>
+																		<li>Paraguay</li>
+																	</ul>
+																</span>
+															</li>
+															<li class="ul">
+																<span>Nordamerika<div>ˇ</div>
+																	<ul>
+																		<li>USA</li>
+																		<li>Kanada</li>		
+																		<li>Mexiko</li>
+																	</ul>
+																</span>
+															</li>
+															<li class="ul">
+																<span>Mittlerer Osten<div>ˇ</div>
+																	<ul>
+																		<li>Israel</li>			
+																	</ul>
+																</span>
+															</li>
+															<li class="ul">
+																<span>Afrika<div>ˇ</div>
+																	<ul>
+																		<li>Ägypten</li>
+																		<li>Kenia</li>
+																		<li>Südafrika</li>
+																		<li>Marokko</li>
+																		<li>Namibia</li>
+																		<li>Simbabwe</li>		
+																	</ul>
+																</span>
+															</li>
+															<li class="ul">
+																<span>Ozeanien<div>ˇ</div>
+																	<ul>
+																		<li>Australien</li>
+																		<li>Neuseeland</li>
+																		<li>Süd-Pazifik</li>			
+																	</ul>
+																</span>
+															</li>
+															<li class="ul">
+																<span>Asien<div>ˇ</div>
+																	<ul>
+																		<li>China</li>
+																		<li>Indien</li>
+																		<li>Indonesien</li>
+																		<li>Kambodscha</li>
+																		<li>Malaysien</li>
+																		<li>Philippinen</li>
+																		<li>Russland</li>
+																	</ul>
+																</span>
+															</li>
+															<li></li>
+
+													</ul></div>
+												</li>
+												<li on-mouseover="unhoverWelt"><a href="http://gastgeber.net/Last-Minute.asp">Last Minute</a></li>
+											</span>
+										</ul>
+										<div id="dropLi" on-mouseleave="unhover">			
+											<input type="radio" name="auswahl" checked="checked" id="span-one">	
+											<input type="radio" name="auswahl" id="span-two">	
+											<input type="radio" name="auswahl" id="span-three">
+											<div class="left">
+												<label for="span-three">‹</label>
+												<label for="span-one">‹</label>
+												<label for="span-two">‹</label>
+											</div>
+											<div class="right">
+												<label for="span-two">›</label>
+												<label for="span-three">›</label>
+												<label for="span-one">›</label>
+											</div>
+											<ul id="dropLiUl">
+												<span>
+													<li>
+														<h4>Schleswig-Holstein</h4>
+														<a href="http://gastgeber.net/Regionen.asp?Bland=15"><img src="/images/schleswig-holstein.jpg" alt="Schleswig-Holstein"></a>
+													</li>
+													<li>
+														<h4>Bayern</h4>
+															<a href="http://gastgeber.net/Regionen.asp?Bland=2"><img src="/images/bayern.jpg" alt="Bayern"></a>
+													</li>
+													<li>
+														<h4>Niedersachsen</h4>
+														<a href="http://gastgeber.net/Regionen.asp?Bland=1"><img src="/images/niedersachsen.jpg" alt="Niedersachsen"></a>
+													</li>
+												</span>
+												<span>
+													<li>
+														<h4><span>Brandenburg &amp;</span><span id="mcPm">Mecklenburg-Vorpommern</span></h4>
+														<a href="http://gastgeber.net/Regionen.asp?Bland=8"><img src="/images/mecklenburg.jpg" alt="Brandenburg und Mecklenburg-Vorpommern"></a>
+													</li>	
+													<li>
+														<h4>Baden-Württemberg</h4>
+														<a href="http://gastgeber.net/Regionen.asp?Bland=1"><img src="/images/bawue.jpg" alt="Baden-Württemberg"></a>
+													</li>
+													<li>
+														<h4><span>Hamburg &amp;</span><span>Berlin</span></h4>
+														<a href="http://gastgeber.net/Regionen.asp?Bland=3"><img src="/images/berlin.jpg" alt="Hamburg und Berlin"></a>
+													</li>
+												</span>
+												<span>
+													<li>
+														<h4><span>Hessen</span><span>Rheinland-Pfalz &amp;</span><span>Saarland</span></h4>
+														<a href="http://gastgeber.net/Regionen.asp?Bland=11"><img src="/images/saarland.jpg" alt="Hessen, Rheinland-Pfalz und Saarland"></a>
+													</li>
+													<li><h4>Nordrhein-Westfalen</h4>
+														<a href="http://gastgeber.net/Regionen.asp?Bland=10"><img src="/images/nrw.jpg" alt="Nordrhein-Westfalen"></a>
+													</li>
+													<li>
+														<h4><span>Sachsen</span><span>Sachsen-Anhalt &amp;</span><span>Thüringen</span></h4>
+														<a href="http://gastgeber.net/Regionen.asp?Bland=13"><img src="/images/thueringen.jpg" alt="Sachsen, Sachsen-Anhalt und Thüringen"></a>
+													</li>
+												</span>
+											</ul>
+										</div>				
+									</nav>	
+								</div>	
+								<span id="euro" class="control" on-tap="showPrice">€</span>
+								<div id="w100">
+									<div id="preisFilter" class="preisFilter">
+										<h3 id="preisTitel">Preis</h3>	
+										<div id="preisSpanne">Preisspanne anpassen</div>					
+										<paper-slider id="preisSlider" min="15" max="150" value="{{upTo}}" pin="" snaps="" step="10" max-markers="15" editable=""></paper-slider>
+									</div>									
+								</div>
+								<paper-icon-button id="number" icon="gastgeber-icons:group" class="control" on-tap="showNumber"></paper-icon-button>
+								<div id="containerNumberFilter">
+									<div id="numberFilter" class="preisFilter">
+										<h3 id="gaesteTitel">Gäste</h3>	
+										<div id="gaesteSpanne">Anzahl Gäste anpassen</div>
+										<paper-slider id="gaesteSlider" min="1" max="15" value="{{guestsUpTo}}" pin="" snaps="" step="1" max-markers="15" editable=""></paper-slider>
+									</div>									
+								</div>
+								<div id="thirdBar">							
+									<paper-icon-button icon="gastgeber-icons:today" id="dates" on-tap="showDates" class="control"></paper-icon-button>
+									<div id="vaadinDates" class="vaadin">
+										<vaadin-date-picker id="anreiseDatum" label="Anreise" value="{{startDate}}" initial-position$="[[getToday()]]" min$="[[getToday()]]" show-week-numbers=""></vaadin-date-picker>
+										<vaadin-date-picker id="abreiseDatum" label="Abreise" min="[[startDate]]" value="{{endDate}}" initial-position="[[startDate]]" show-week-numbers=""></vaadin-date-picker>
+									</div>
+								</div>	
+						</app-toolbar>	
+					</app-header>
+					<main on-tap="unhoverAll">
+						<section>
+							<div id="sectionFirstDiv">
+							<h2>Unsere Unterkünfte für Ihren Wanderurlaub</h2>
+								<div id="listCont">
+									<iron-list items="[[_filterObjects(data, upTo, guestsUpTo)]]" as="data" scroll-target="listCont">	
+										<template>
+											<div tabindex$="[[tabindex]]">
+												 <h3 class="fewoTitle">[[data.broadReg]] - [[data.subReg]]</h3>
+												 <div class="fewoCont">
+													<a href$="http://www.gastgeber.net/[[data.fewoId]]">
+														<iron-image class$="fewoImg [[data.floatClass]]" sizing="cover" src="[[data.image]]" style="background-color: lightgray" preload="" fade=""></iron-image>
+														<div class="fewoInfo">
+															<p class="fewoTxt">[[data.fewoTxt]]</p>	
+															<p class="fewoLnk">[[data.fewoTyp]] [[data.fewoTyp2]] [[data.fewoId]]</p>
+														</div>
+												 	</a>
+												 </div>										 
+												<div class="ort">
+													<paper-icon-button icon="gastgeber-icons:location-on"></paper-icon-button><span>Lage: [[data.ort]]</span>
+												</div>										
+												<div class="fewoIcon">
+													<div>	
+														<span>Größe</span>					
+														<paper-icon-button icon="gastgeber-icons:home"></paper-icon-button>
+														<span>[[data.sizeMin]] m²</span>
+													</div>
+													<div>
+														<span>Anzahl Gäste</span>
+														<paper-icon-button icon="gastgeber-icons:group"></paper-icon-button><span>[[data.maxPs]] Ps.</span>
+													</div>
+													<div>				
+														<span>Preis</span>											
+														<paper-icon-button icon="gastgeber-icons:local-offer"></paper-icon-button>
+														<span>[[data.priceMinLSDay]][[data.priceLSWeek]] €[[data.day]][[data.week]]</span>
+													</div> 
+												</div>
+											</div>	
+										</template>
+									</iron-list>
+								</div>
+							</div>
+							<div>								
+								<div id="kalender">
+									<div>
+										<vaadin-date-picker id="anreise" label="Anreise" value="{{startDate}}" initial-position$="[[getToday()]]" min$="[[getToday()]]" show-week-numbers=""></vaadin-date-picker>
+										<vaadin-date-picker id="abreise" label="Abreise" min="[[startDate]]" value="{{endDate}}" initial-position="[[startDate]]" show-week-numbers=""></vaadin-date-picker>
+									</div>
+								</div>
+							</div>
+						</section>
+					</main>
+				
+				</app-header-layout>
+			</div>
+		</app-drawer-layout>
+		<footer>
+
+		</footer>
+
+	</template>
+
+	<script>Polymer({is:"gastgeber-suche",properties:{smallScreen:{type:Boolean},anfrage:{type:String,value:"",notify:!0},startDate:{type:Date},endDate:{type:Date},upTo:{type:Number,value:125},guestsUpTo:{type:Number,value:6}},openSub:function(e){var t=Polymer.dom(this.root).querySelector(".active");null!=t&&Polymer.dom(t).classList.remove("active");var o=Polymer.dom(this.root).querySelector(".blue");null!=o&&Polymer.dom(o).classList.remove("blue"),Polymer.dom(e.target).setAttribute("class","blue style-scope gastgeber-net"),Polymer.dom(e.target).nextElementSibling.setAttribute("class","active style-scope gastgeber-net")},dropdownDE:function(){this.$.dropLi.style.display="block",this.$.listEU.style.display="none"},unhover:function(){this.$.dropLi.style.display="none"},dropdownEU:function(){this.$.listEU.style.display="block",this.$.dropLi.style.display="none",this.$.listWelt.style.display="none"},unhoverEU:function(){this.$.listEU.style.display="none"},dropdownWelt:function(){this.$.listWelt.style.display="block",this.$.listEU.style.display="none",this.$.dropLi.style.display="none"},unhoverWelt:function(){this.$.listWelt.style.display="none"},unhoverAll:function(){this.$.dropLi.style.display="none",this.$.listEU.style.display="none",this.$.listWelt.style.display="none"},submit:function(){this.$.schnellsuche.submit()},checkEnter:function(){window.event&&13==window.event.which&&this.$.schnellsuche.submit()},top:function(){window.scrollTo(0,0),this.$.input.focus()},showDates:function(e){var t=this.$.vaadinDates;Polymer.dom(t).classList.toggle("fromLeft");var o=this.$.thirdBar;Polymer.dom(o).classList.toggle("boxShadow")},showPrice:function(e){var t=this.$.preisFilter;Polymer.dom(t).classList.toggle("fromLeft");var o=this.$.w100;Polymer.dom(o).classList.toggle("boxShadowTB")},_filterObjects:function(e,t,o){function i(e){if(e.priceMinLSDay<=t|e.priceLSWeek<=7*t&&e.maxPs<=o)return!0}var s=e,n=s.filter(i);if(n.length>0)return n;var r=document.createElement("paper-dialog");Polymer.dom(r).setAttribute("id","errorDialog");var l=document.createElement("h2"),a=document.createTextNode("Leider keine Treffer!");Polymer.dom(l).appendChild(a),Polymer.dom(r).appendChild(l),Polymer.dom(this.$.sectionFirstDiv).appendChild(r),Polymer.dom(r).setAttribute("opened","true"),setTimeout(window.location.reload.bind(window.location),100)},showNumber:function(e){var t=this.$.numberFilter;Polymer.dom(t).classList.toggle("fromLeft");var o=this.$.containerNumberFilter;Polymer.dom(o).classList.toggle("boxShadowTB")},getToday:function(){var e=new Date,t=e.getFullYear(),o=e.getMonth()+1,i=e.getDate();return i<10&&(i="0"+i),o<10&&(o="0"+o),e=t+"-"+o+"-"+i},ready:function(){this.$.anreiseDatum.i18n=this.$.anreise.i18n=this.$.abreiseDatum.i18n=this.$.abreise.i18n={week:"Woche",calendar:"Kalender",clear:"zurücksetzen",today:"heute",cancel:"abbrechen",firstDayOfWeek:1,monthNames:["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],weekdays:"Sonntag_Montag_Dienstag_Mittwoch_Donnerstag_Freitag_Samstag".split("_"),weekdaysShort:["so","mo","di","mi","do","fr","sa"],formatDate:function(e){return[e.getDate(),e.getMonth()+1,e.getFullYear()].join(".")},formatTitle:function(e,t){return e+" "+t}}}});</script>
+</dom-module></body></html>

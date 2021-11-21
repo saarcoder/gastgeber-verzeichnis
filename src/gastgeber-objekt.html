@@ -1,0 +1,1783 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+--><html><head><link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../bower_components/iron-image/iron-image.html">
+<link rel="import" href="../bower_components/iron-lazy-pages/iron-lazy-pages.html">
+<link rel="import" href="../bower_components/app-layout/app-box/app-box.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-carousel/paper-carousel.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid-column.html">
+<link rel="import" href="../bower_components/vaadin-grid/vaadin-grid-column-group.html">
+<link rel="import" href="../bower_components/calendar-lite/calendar-lite.html" <link="">
+<link rel="import" href="../bower_components/google-map/google-map.html">
+<link rel="import" href="../bower_components/google-map/google-map-marker.html">
+<link rel="import" href="more-images.html">
+<link rel="import" href="gastgeber-icons.html">
+<link rel="icon" href="images/manifest/favicon.ico">
+
+</head><body><dom-module id="gastgeber-objekt">
+
+	<template>
+
+		<style>
+			:host {
+				display: block;
+				--app-primary-color: #19b3ec;
+				--app-secondary-color: #076499;
+				--app-highlight-color: deeppink;
+				--first-bar-height: 32px;
+				--rounded-border: 5px;
+				--border-circle: 50%;				
+				--paper-tabs-selection-bar-color: var(--app-secondary-color);
+				--paper-tab-ink: var(--app-primary-color);
+				--paper-dialog-background-color: rgba(25,25,25,0);
+				--paper-dialog-dark-contrast: #222;
+				--paper-tooltip: {
+					margin-top: -5.25rem;
+					margin-left: -5rem;
+					font-size: .75rem;
+					text-align: center;
+					opacity: 1;
+					background: #000;
+				};
+				--iron-icon-height: 2.5rem;
+				--iron-icon-width: 2.5rem;
+			}
+			/* paper-checkbox[disabled][checked]: paper-checkbox.html > opacity in disabled state manuell entfernt */
+			a {
+				text-decoration: none;
+				color: inherit;
+			}     
+			ul {				
+				margin: 0;
+				padding: 0;
+				-webkit-padding-start: 0;
+			} 
+			li {
+				list-style-type: none;
+				display: inline;
+			}
+			h2, h3, h4, h5, ul, li, a, p {
+			    -webkit-margin-before: 0;
+    			-webkit-margin-after: 0;
+				-webkit-padding-start: 0;
+			}	
+			#mainImage {
+				position: relative;
+				width: 100%;
+				--iron-image-width: 100%;
+				height: 270px;
+				border-top: 1px solid #eee;
+				margin-top: var(--first-bar-height);
+			}	
+			header {
+				position: absolute;
+				top: 0;
+				left: 0;		
+				height: var(--first-bar-height);	
+				width: 100%;
+				display: flex;
+				flex-flow: row nowrap;
+				justify-content: space-between;
+				align-items: center;
+			}
+			header > a > img {		
+				height: 1.35rem;
+				width: 1.35rem;
+				margin-top: .35rem;
+				padding: 0 .5rem;
+				transform: rotate(-7deg);
+			}
+			header > div {
+				display: flex;
+				flex-flow: row nowrap;
+				justify-content: center;
+			}
+			paper-input {	
+				font-weight: 100;
+				position: relative;
+				left: .5rem;
+				--input-label-top: -3px;
+				--paper-input-container-invalid-color: limegreen;
+				--paper-input-container-focus-color: var(--app-primary-color);
+				--paper-input-container-underline: {
+					display: none;
+				};
+				--paper-input-container-underline-focus: {
+					font-weight: 100;
+					margin-top: -.4rem;
+				};
+				--paper-input-container: {
+					padding: 0;
+					margin: 0;
+				};
+				--paper-input-container-label: {					
+					line-height: 1;
+					margin-top: var(--input-label-top);
+					font-size: .75rem;
+					letter-spacing: .3px;
+					text-align: center;
+					color: var(--app-primary-color);
+				};
+				--paper-input-container-label-focus: {
+					font-weight: 100;
+				};
+				--paper-input-container-label-floating: {
+					font-size: .75rem;
+					margin-top: 0;
+					color: var(--app-primary-color);
+				};
+				--paper-input-container-input: {
+					font-size: .85rem;
+					font-weight: 300;
+					letter-spacing: 0px;
+					text-align: center;
+					top: -.15rem;
+					color: var(--app-secondary-color);
+				};
+			}
+			header form input {
+				display: none;
+			}					
+			#suchLupe {		
+				position: relative;
+				left: -3.75rem;	
+			}	
+			#suchLupe.js-pushed {
+				transform: translateX(3rem);
+			}			
+			#sprachwahl {
+				display: none;
+			}			
+			header > a#anmelden {
+				display: none;
+			}	
+			header paper-icon-button {
+				height: 2rem;
+    			width: 2rem;
+				--paper-icon-button-ink-color: var(--app-primary-color);	
+				color: var(--app-primary-color);
+				margin: auto 0;
+			} 	
+			#price {
+				position: absolute;
+				top: var(--first-bar-height);
+				margin-top: 1rem;
+				right: 1rem;
+				width: 4rem;
+				height: 4rem;
+				background: radial-gradient(1rem at 2rem 51.5%, #333 0%, #333 .25rem, rgba(0,0,0,.2) 1.4rem, rgba(0,0,0,0) 1.8rem);
+			}
+			#priceColor {
+				fill: yellow;
+			}
+			#priceIcon {
+				position: absolute;
+				top: var(--first-bar-height);
+				margin-top: 1.5rem;
+				right: 1.5rem;
+				width: 2rem;
+				height: 2rem;
+				padding: .5rem;
+				font-size: 1.35rem;
+				font-weight: bold;
+				color: #fff;
+				text-shadow: 1px 1px 3px #333;
+				border-radius: var(--border-circle);
+				box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.08), 0 1px 9px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.2);				
+			}
+			#tooltipHost > paper-tooltip {
+				--paper-tooltip: {
+					margin-top: 0rem;
+					margin-right: 1.5rem;
+					font-family: sans-serif;
+					font-size: .85rem;
+					text-align: center;
+					line-height: 1.35;
+					opacity: 1;
+					background: #000;
+					border-radius: var(--rounded-border);
+				};
+			}
+			#priceIcon > div {
+				font-size: .85rem;
+				line-height: .5;
+				margin-left: 6px;
+			}
+			#priceIcon > span {
+				margin-left: 2px;
+			}
+			#secondBar {
+				position: relative;
+				margin-top: -32px;
+				top: -7px;
+				width: 100%;
+				height: var(--first-bar-height);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}	
+			#secondBar > paper-fab {
+				margin-left: 1.25rem;
+				margin-bottom: 2.75rem; 
+				--paper-fab-background: var(--app-highlight-color);
+				--paper-fab: {
+					height: 2.75rem;
+					width: 2.75rem;
+					padding: .5rem;
+				};
+			}
+			#secondBar > div {				
+				height: var(--first-bar-height);
+				margin-right: 1rem;
+			}
+			#secondBar > div > p {
+				height: calc(var(--first-bar-height) - 1rem);
+				background-color: #fff;
+				padding: 1rem 1rem .3rem 1rem;
+				color: #555;
+				border-top-left-radius: var(--border-circle);
+				border-top-right-radius: var(--border-circle);
+				font-size: .75rem;
+				font-weight: bold;
+				line-height: 1;
+				text-align: center;
+			}
+			.navBar {
+				width: 100%;
+				height: calc(var(--first-bar-height) - 1px);
+				margin-top: -6px;
+				padding: 0;
+				color: var(--app-primary-color);
+				border-bottom: 1px solid #ccc;
+				background: #fff;
+			}		
+			[threshold-triggered] {
+				position: fixed;
+				top: 6px;
+				left: 0;
+				right: 0;
+				z-index: 2;
+			}      
+			paper-tabs {
+				height: var(--first-bar-height);
+				width: 100%;
+			}
+			paper-tab.iron-selected {
+				color: var(--app-secondary-color);
+			}
+			paper-tab[link] {
+				font-size: .75rem;
+				text-align: center;
+				margin-top: 12px;
+			}
+			paper-tab span {
+				display: none;
+			}
+			more-images {
+				color: yellow;	
+			}
+			#closeImg {
+				position: absolute;
+				top: 6.25rem;
+				right: 0rem;
+				width: 2.5rem;
+				height: 2.5rem;
+				z-index: 1;
+			}
+			paper-carousel {		
+				width: 100%;
+			}
+			.galleryImage {
+				margin-top: calc((100vh - 100vw*.75) / 2);
+				width: 100%;
+				height: calc(100vw * .75);
+			}
+			section {
+				min-height: 380px;
+				margin: 1.25rem 0;
+				color: #444;
+				text-align: center;
+			}
+			section h3, google-map-marker h4, section p {
+				line-height: 1.15;
+				margin: 0 1rem;
+			}
+			section > h3 {
+				margin-bottom: .25rem;
+				font-size: 1rem;
+			}
+			section#Preise > h3 {
+				margin-bottom: .5rem;
+			}
+			section > p {
+				font-size: .75rem;
+				margin-bottom: .25rem;
+			}			
+			#icons {
+				display: flex;
+				justify-content: space-around;
+				align-items: flex-end;
+				width: 85%;
+				margin-left: 7.5%;
+				margin-top: -.5rem;
+			}
+			#icons > div {				
+				width: 50px;
+				margin: 0 auto;
+			}
+			section#Details paper-icon-button {
+				height: 50px;
+				width: 50px;
+				padding: 0;
+				padding-left: 16px;
+				color: var(--app-primary-color);
+				margin-bottom: -1rem;
+				cursor: default;
+			}
+			section#Details paper-icon-button#bed {
+				height: 60px;
+				width: 60px;
+				padding-top: 15px;
+				padding-left: 8px;
+			}
+			#icons > div > div {
+				line-height: 1.125;
+				font-size: .75rem;
+				color: var(--app-primary-color);
+			}
+			.abschnitt {
+				margin-bottom: 1.35rem;
+			}
+			.abschnitt p {
+				text-align: left;
+				font-size: .75rem;
+				line-height: 1.5;
+				margin-left: 1.5rem;
+				display: inline-block;
+			}
+			.abschnitt > h5, h4 {
+				margin-bottom: .35rem;
+			}
+			.flex {
+				display: flex;
+				flex-flow: row wrap;
+				justify-content: flex-start;
+				align-items: flex-start;
+				width: calc(100% - 3rem);
+				margin-left: 1.5rem;
+				border-top: 1px solid #999;
+				padding-top: .5rem;
+			}
+			.flex > * {
+				flex: 1;			
+				min-width: 35%;
+				text-align: left;
+				margin-bottom: .5rem;
+			}				
+			.flex > h5 {
+				font-size: .65rem;
+				line-height: 1.25;
+				text-align: left;
+				flex: 0;
+				min-width: 27.5%;
+			}		
+			.flex > .vier {
+				flex: 0;
+				min-width: 27.5%;
+			}
+			.flex > div > p {
+				display: flex;
+				align-items: flex-start;
+				font-size: .65rem;
+				line-height: 1.25;
+				margin-right: .5rem;
+				margin-bottom: .35rem;
+				margin-left: 0;
+			}
+			.false {
+				text-decoration: line-through;
+			}
+			.flex > div > p.hidden {
+				display: none;
+			}
+			section#Preise > .flex-2 > * {
+				min-width: 35%;
+			}
+			.flex-2 p:nth-of-type(2) {
+				margin-top: -.15rem;	
+			}
+			section#Preise > .flex-2 > div:nth-of-type(5) {
+				max-width: 80%;
+			}
+			.rabatte {
+				margin-top: -1.5rem;
+				margin-left: 1.5rem;
+				display: flex;
+				flex-flow: row wrap;
+				width: calc(100% - 3rem);
+			}
+			paper-checkbox {		
+				text-align: left;
+				margin-bottom: .35rem;
+				min-width: 50%;
+				flex: 1;
+         		line-height: 1;
+				--primary-text-color: #666;
+				--paper-checkbox-size: .75rem;
+				--paper-checkbox-label: {
+					padding-left: .65rem;
+					font-size: .65rem; 
+					font-family: sans-serif;        
+				};
+				--paper-checkbox-label-color: #444;
+			}
+			section > .abschnitt > .li {
+				display: block;
+				margin-bottom: .5rem;
+				width: 85%;
+				margin-left: 7.5%;
+			}
+			.blockparent > p {
+				display: block;
+				margin-bottom: .25rem;
+			}
+			vaadin-grid, #selectYear {
+				display: block;
+				margin-left: 1.5rem;
+				margin-right: 1.5rem;
+				--paper-checkbox-label: {
+					font-size: .75rem;
+				};
+			}
+			vaadin-grid {
+				max-height: 60vh;
+				margin-bottom: 4rem;
+				border: none;
+				---vaadin-grid-body-row-odd-cell: {
+					background-color: rgb(200, 200, 255);
+				};
+				--vaadin-grid-header-cell: {
+					flex-direction: row;
+					align-items: center;
+					font-size: .75rem;
+					height: 35px;
+				};
+				--vaadin-grid-body-cell: { 
+					flex-direction: row;
+					align-items: center;
+					height: 35px; 
+					font-size: .55rem;
+					};
+			}
+			vaadin-grid span {
+				width: 1.5rem;
+				height: 1.5rem;
+				margin-right: .75rem;
+			}
+			.yellow {
+				background-color: yellow;
+			}
+			.orange {
+				background-color: orange;
+			}
+			.blue {
+				background-color: blue;
+			}
+			section#Lage {
+				height: 400px;
+			}
+			section#Lage h3 {
+				margin-bottom: 0;
+			}
+			section > google-map {
+				width: 90%;
+				height: 345px;
+				margin: 1rem 5% 2rem 5%;
+			}
+			google-map h4 {
+				margin: .25rem 0;
+			}
+			google-map p {
+				line-height: 1.35;
+			}
+			google-map img {
+				margin: .5rem 0;
+				height: 105px;
+			}	
+			calendar-lite {
+				display: none;
+				margin: .5rem 0;
+				padding-bottom: .25rem;
+				--my-elem-primary: 	var(--app-primary-color);
+			}		
+			#startDate {
+			}
+
+
+		@media (min-width: 320px) {
+			#suchLupe {
+				right: 32vw;
+			}
+			#price {
+				background: radial-gradient(1rem at 2rem 53%, #333 0%, #333 .25rem, rgba(0,0,0,.2) 1.5rem, rgba(0,0,0,0) 1.8rem);
+			}
+			#closeImg {
+				top: 7.5rem;
+				width: 3rem;
+				height: 3rem;
+			}	
+			section {
+				margin: 1.75rem 0;
+			}
+			section h3, section h4, section p {
+				line-height: 1.25;
+			}
+			section > h3 {
+				margin-bottom: .25rem;
+				font-size: 1.25rem;
+			}
+			section > p {
+				font-size: .9rem;
+				margin-bottom: .25rem;
+			}	
+			#icons {
+				margin-top: 0;
+				width: 80%;
+				margin-left: 10%;
+			}
+			#icons > div {				
+				width: 70px;				
+			}
+			#icons > div:first-of-type {				
+				width: 80px;
+			}
+			#icons > div > div {
+				line-height: 1.125;
+				font-size: 1rem;
+			}
+			section#Details paper-icon-button {
+				height: 65px;
+				width: 65px;
+				margin-bottom: -1.15rem;
+			}
+			section#Details paper-icon-button#bed {
+				height: 75px;
+				width: 75px;
+				padding-top: 15px;
+				padding-left: 15px;
+			}
+			.flex > h5, .flex > div > p, h4 {
+				font-size: .75rem;
+			}	
+			paper-checkbox {	
+				--paper-checkbox-label: {
+					font-size: .75rem;        
+					font-family: sans-serif;   
+				};
+			}
+			vaadin-grid, #selectYear {
+				--paper-checkbox-label: {
+					font-size: .85rem;
+				};
+			}
+			vaadin-grid {
+				max-height: 50vh;
+				margin-bottom: 3rem;
+				--vaadin-grid-header-cell: {
+					flex-direction: row;
+					align-items: center;
+					font-size: .85rem;
+				};
+				--vaadin-grid-body-cell: { 
+					flex-direction: row;
+					align-items: center;
+					height: 35px; 
+					font-size: .7rem;
+					};
+			}
+			vaadin-grid span {
+				width: 1rem;
+				height: 1rem;
+				margin-right: .75rem;
+			}
+			section#Lage {
+				height: 500px;
+			}
+			google-map h4 {
+				margin: .75rem 0 .25rem 0;
+				font-size: 1rem;
+			}
+			google-map p {
+				line-height: 1.5;
+				font-size: 12px;
+			}
+		}
+		@media (min-width: 375px) {
+			:host {
+				--iron-icon-height: 3.5rem;
+				--iron-icon-width: 3.5rem;
+			}
+			#suchLupe {
+				right: 35vw;
+			}
+			#closeImg {
+				top: 9rem;
+			}
+			.abschnitt {
+				margin-bottom: 1.75rem;
+			}
+			.abschnitt > h5, h4 {
+				font-size: 1rem;
+			}
+			.flex {
+				padding-top: .75rem;
+			}
+			.abschnitt p, .flex > h5, .flex > div > p, h4 {
+				font-size: .85rem;
+			}
+			paper-checkbox {	
+				margin-bottom: .5rem;
+				--paper-checkbox-label: {
+					padding-left: .85rem; 
+					font-family: sans-serif;  
+					font-size: .85rem;         
+				};
+			}
+		}
+		@media (min-width: 480px) {
+			#mainImage {
+				height: calc(270px - var(--first-bar-height));
+			}
+			#secondBar > div {
+				height: calc(var(--first-bar-height) + 1rem);
+				margin-right: 1rem;
+			}
+			#secondBar > div > p {
+				height: var(--first-bar-height);
+				padding: 1.15rem 1rem .3rem 1rem;
+			}
+			paper-tab span {
+				display: inline;
+			}
+			#closeImg {
+				top: 11rem;
+				width: 3.5rem;
+				height: 3.5rem;
+			}
+			#icons {
+				width: 75%;
+				margin-left: 12.5%;
+			}
+			#icons > div {				
+				width: 90px;				
+			}
+			#icons > div:first-of-type {				
+				width: 100px;
+			}
+			#icons > div > div {
+				line-height: 1.135;
+				font-size: 1.15rem;
+			}
+			section#Details paper-icon-button {
+				height: 90px;
+				width: 90px;
+				padding-left: 24px;
+				margin-bottom: -1.35rem;
+			}
+			section#Details paper-icon-button#bed {
+				height: 100px;
+				width: 100px;
+				padding-top: 16px;
+				padding-left: 20px;
+			}
+			vaadin-grid, #selectYear {
+				--paper-checkbox-label: {
+					font-size: 1rem;
+				};
+			}
+			vaadin-grid {
+				max-height: 45vh;
+				--vaadin-grid-header-cell: {
+					flex-direction: row;
+					align-items: center;
+					font-size: 1rem;		
+					height: 50px;			
+				};
+				--vaadin-grid-body-cell: { 
+					flex-direction: row;
+					align-items: center;
+					height: 50px; 
+					font-size: .85rem;
+					};
+			}
+			vaadin-grid span {
+				width: 1rem;
+				height: 1rem;
+				margin-right: .75rem;
+			}
+		}
+		@media (min-width: 568px) {
+			:host {
+				--first-bar-height: 50px;
+				--paper-tooltip: {
+					margin-top: -5.75rem;
+					margin-left: -6.5rem;
+					font-size: .75rem;
+					text-align: center;
+					opacity: 1;
+					background: #000;
+					letter-spacing: 1px;
+				--iron-icon-height: 4rem;
+				--iron-icon-width: 4rem;
+				};
+			}
+			#mainImage {
+				margin-top: -1rem;
+				height: calc(100vh + 1rem);
+				max-height: 500px;
+			}
+			header {		
+				background-color: rgba(255,255,255,.3);
+			}
+			header > a > img {		
+				height: 2rem;
+				width: 2rem;
+				margin-top: .5rem;
+				padding: 0;
+				padding-left: 1rem;
+			}
+			#suchLupe {
+				right: 62vw;
+				height: 2.65rem;
+				width: 2.65rem;
+				margin-top: .1rem
+			}
+			paper-input {	
+				--input-label-top: -4px;
+				--paper-input-container-underline-focus: {
+					font-weight: 100;
+					margin-top: 1px;
+				};
+				--paper-input-container: {
+					padding: 0;
+					margin: 0;
+				};
+				--paper-input-container-label: {					
+					line-height: 1;
+					margin-top: var(--input-label-top);
+					font-size: 1.1rem;
+					letter-spacing: .3px;
+					text-align: center;
+					color: var(--app-primary-color);
+				};
+				--paper-input-container-label-floating: {
+					font-size: 1rem;
+					margin-top: 0;
+					color: var(--app-primary-color);
+				};
+				--paper-input-container-input: {
+					font-size: 1rem;
+					font-weight: 400;
+					letter-spacing: 0px;
+					text-align: center;
+					top: .1rem;
+					color: var(--app-secondary-color);
+				};
+			}
+			header > a#anmelden {				
+				display: inline;
+				margin: .3rem 0 0 1.5rem;
+				color: var(--app-primary-color);
+				font: 100 1.1rem/1 sans-serif;
+			}
+			#sprachwahl {
+				display: block;
+				height: 42px;
+				width: 87px;
+				margin-left: 2.7rem;
+				padding-top: .5rem;
+				padding-right: .5rem;
+			}			
+			#sprachwahl > #svg1 {
+				display: inline-block;
+				width: 1.35rem;
+				height: 1.35rem;
+				padding: .2rem 0 0 1rem;
+			    margin: .25rem 0 -.25rem 0;
+			}
+			#svg1Fill {
+				fill: var(--app-primary-color);;
+			}
+			#sprachwahl > #svg2 {
+				position: relative;
+				top: -5.2rem;
+				left: 4.1rem;
+				height: 1rem;
+				width: 1rem;
+			}
+			#dropdown {
+				fill: var(--app-primary-color);;
+			}
+			#sprachwahl p {
+				position: relative;
+				display: inline-block;
+				font: 500 1rem/1 sans-serif;
+				color: var(--app-primary-color);;	
+				margin-left: 0;
+			}		
+			.dropdown-lang {
+				border-bottom: .25rem solid var(--app-secondary-color);
+				background-color: rgba(255,255,255,.5);
+				color: var(--app-secondary-color);
+				margin: .6rem -.25rem 0 0;
+				width: 95px;
+				opacity: 0;
+			}	
+			#sprachwahl:hover .dropdown-lang {
+				opacity: 1;
+			}
+			.dropdown-lang ul {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				cursor: pointer;
+				height: var(--first-bar-height);
+			}
+			.dropdown-lang li{					
+				font-size: 1.15rem;
+				padding: 12px;
+				width: 67px;
+				line-height: 2;
+			}	
+			header > paper-icon-button {
+				width: 2.35rem;
+				height: 2.35rem;
+			}
+			.menu-icon[icon] {
+				margin-right: .5rem;
+			}
+			#secondBar {
+				height: var(--first-bar-height);
+				margin-top: -50px;
+			}
+			#secondBar > paper-fab {
+				margin-left: 3rem;
+				margin-bottom: 3rem;
+				--paper-fab: {
+					height: 3.275rem;
+					width: 3.25rem;
+					padding: .75rem;
+				};
+			}
+			#secondBar > div {
+				height:var(--first-bar-height);
+				margin-right: 1.5rem;
+			}
+			#secondBar > div > p {
+				font-size: 1rem;
+				padding: 1.5rem 1.25rem .3rem 1.25rem;
+			}
+			#closeImg {
+				right: 0;
+				top: 0;
+				width: 3rem;
+				height: 3rem;
+			}
+			paper-carousel {		
+				width: 80%;
+				left: 10%;
+			}
+			.galleryImage {
+				margin-top: calc((100vh - 80vw*.75) / 2);
+				width: 80%;
+				height: calc(80vw * .75);
+			}
+			paper-tabs {
+				height: calc(var(--first-bar-height) - 8px);
+				padding-top: 8px;
+			}
+			paper-tab {
+				font-size: 1.25rem;
+			}
+			section#Details paper-icon-button {
+				margin-bottom: -1.5rem;
+			}
+			#icons > div > div:first-of-type {
+				font-size: 1.7rem;
+				line-height: 1;
+			}
+			#icons > div > div:first-of-type.fewoTyp{
+				font-size: 1.15rem;
+				line-height: 1.25;
+			}
+			.abschnitt > h5, h4 {
+				font-size: 1.15rem;
+			}
+			.abschnitt > p, .flex {
+				margin-left: 2rem;
+				margin-right: 2rem;
+			}
+			.flex > * {
+				margin-bottom: 1rem;
+			}
+			.abschnitt p, .flex > h5, .flex > div > p, h4 {
+				font-size: 1rem;
+			}
+			.rabatte {
+				margin-left: 2rem;
+			}
+			paper-checkbox {	
+				margin-bottom: .75rem;
+				--paper-checkbox-size: 1rem;
+				--paper-checkbox-label: {
+					font-family: sans-serif;  
+					padding-left: 1rem; 
+					font-size: 1rem;         
+				};
+			}
+			section#Preise > .flex-2 > div:nth-of-type(5) > p > span {
+				margin-left: .35rem;
+			}
+			blockparent > p {
+				margin-bottom: .5rem;
+			}
+			vaadin-grid, #selectYear {
+				margin-left: 2rem;
+			}
+			vaadin-grid {
+				max-height: 80vh;
+				--vaadin-grid-header-cell: {
+					flex-direction: row;
+					align-items: center;
+					font-size: 1.25rem;
+				};
+			}
+			section > google-map {
+				width: 90%;
+				height: 300px;
+				margin-left: 5%;
+				margin-bottom: 3rem;
+		}
+
+		@media (min-width: 640px) {
+			header {
+				box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.2);
+			}
+			#secondBar > paper-fab {
+				--paper-fab: {
+					height: 3rem;
+					width: 3rem;
+					padding: .8rem;
+				};
+			}
+		}
+		@media (min-width: 740px) {
+			:host {
+				--first-bar-height: 60px;
+				--iron-icon-height: 4.5rem;
+				--iron-icon-width: 4.5rem;
+			}
+			#mainImage {
+				margin-top: var(--first-bar-height);
+				height: 500px;
+			}
+			header > a > img {
+				height: 2.5rem;
+				width: 2.5rem;
+				padding-left: 1.5rem;
+			}
+			paper-input {	
+				left: 1.25rem;
+				--input-label-top: -.5rem;
+				--paper-input-container-underline-focus: {
+					font-weight: 100;
+					margin-top: 6px;
+				};
+				--paper-input-container-label: {					
+					line-height: 1;
+					margin-top: var(--input-label-top);
+					font-size: 1.3rem;
+					letter-spacing: .3px;
+					text-align: center;
+					color: var(--app-primary-color);
+				};
+				--paper-input-container-label-floating: {
+					font-size: 1.25rem;
+					margin-top: 0;
+					color: var(--app-primary-color);
+				};
+				--paper-input-container-input: {
+					font-size: 1.25rem;
+					font-weight: 400;
+					letter-spacing: 0px;
+					text-align: center;
+					top: .3rem;
+					color: var(--app-secondary-color);
+				};
+			}
+			#suchLupe.js-pushed {
+				transform: translateX(3.5rem);
+			}
+			header > a#anmelden {
+				margin-top: 0;
+				font-size: 1.3rem;
+			}
+			#sprachwahl > #svg1 {
+				margin: 0;
+				padding-top: .3rem;
+			}
+			#sprachwahl p {
+				font-size: 1.2rem;
+				top: -.2rem;
+			}
+			#sprachwahl > #svg2 {
+				top: -6.2rem;
+				left: 4.5rem;
+				height: 1.25rem;
+				width: 1.25rem;
+			}
+			.dropdown-lang {
+				background-color: rgba(255,255,255,.85);
+			}
+			#price {
+				margin-top: 2rem;
+				right: 2rem;
+				width: 6rem;
+				height: 6rem;
+			    background: radial-gradient(1rem at 3rem 53%, #333 0%, #333 .25rem, rgba(0,0,0,.2) 2.1rem, rgba(0,0,0,0) 2.85rem);
+			}
+			#priceIcon {
+				margin-top: 3rem;
+				right: 3rem;
+				width: 3rem;
+				height: 3rem;
+				padding: .5rem;
+				font-size: 1.35rem;
+				box-shadow: 0 3px 5px 0 rgba(0, 0, 0, 0.08), 0 1px 9px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
+				font-size: 1.5rem;
+			}
+			#priceIcon > div {
+				margin-top: .5rem;
+				margin-left: 14px;
+			}
+			#priceIcon > span {
+				margin-left: 9px;
+			}
+			#tooltipHost > paper-tooltip {
+				--paper-tooltip: {
+					margin-top: 0rem;
+					margin-right: 1.5rem;
+					font-family: sans-serif;
+					font-size: 1.15rem;
+					text-align: center;
+					line-height: 1.35;
+					opacity: 1;
+					background: #000;
+					border-radius: var(--rounded-border);
+				};
+			}
+			#secondBar {
+				height: calc(var(--first-bar-height) + 1rem);
+				margin-top: calc(-60px - 1rem);
+			}
+			#secondBar > paper-fab {
+				margin-left: 2.75rem;
+				margin-bottom: 4rem;
+				--paper-fab: {
+					height: 4.75rem;
+					width: 4.75rem;
+					padding: 0;
+				};
+				--paper-fab-iron-icon: {
+					width:2.5rem;
+					height: 2.5rem;
+				};
+			}
+			#secondBar > div > p {
+				font-size: 1.2rem;
+				    padding: 2.25rem 1.5rem .3rem 1.5rem;
+			}
+			#closeImg {
+				top: 9rem;
+				width: 4.75rem;
+				height: 4.75rem;
+			}
+			paper-carousel {		
+				width: 100%;
+				left: initial;
+			}
+			.galleryImage {
+				margin-top: calc((100vh - 100vw*.75) / 2);
+				width: 100%;
+				height: calc(100vw * .75);
+			}
+			paper-tabs {
+				height: calc(var(--first-bar-height) - 10px);
+				padding-top: 10px;
+				--paper-tabs-selection-bar: {
+					border-bottom: 3px solid var(--app-secondary-color);
+				};
+			}
+			section {
+				margin: 2.75rem 0;
+			}
+			section h3, section h4, section p {
+				line-height: 1.25;
+			}
+			section > h3 {
+				margin-bottom: .25rem;
+				font-size: 1.85rem;
+			}			
+			section > p, section > span.subline {
+				font-size: 1.35rem;
+				margin-bottom: .75rem;
+			}
+			#icons {
+				width: 65%;
+				margin-left: 16.25%;
+			}
+			#icons > div {				
+				width: 120px;				
+			}
+			#icons > div:first-of-type {				
+				width: 130px;
+			}
+			#icons > div > div {
+				font-size: 1.35rem;
+				line-height: 1.25;
+			}
+			#icons > div > div:first-of-type {
+				font-size: 1.85rem;
+				line-height: 1.25;
+			}
+			#icons > div > div:first-of-type.fewoTyp{
+				font-size: 1.35rem;
+				line-height: 1.35;
+			}
+			section#Details paper-icon-button {
+				height: 100px;
+				width: 100px;
+				padding-left: 26px;
+				margin-bottom: -28px;
+			}
+			section#Details paper-icon-button#bed {
+				height: 110px;
+				width: 110px;
+				padding-top: 24px;
+				padding-left: 26px;
+			}	
+			.abschnitt {
+				margin-bottom: 2.5rem;
+			}
+			.abschnitt > h5, h4 {
+				font-size: 1.5rem;
+			}
+			.abschnitt > p, .flex {
+				margin-left: 4rem;
+				margin-right: 4rem;
+			}
+			.abschnitt > p, .flex > div > p {
+				font-size: 1.25rem;
+			}
+			.flex {
+			    padding-top: 1.25rem;
+				width: 85%;
+			}
+			section#Preise > h3 {
+				margin-bottom: 1rem;
+			}
+			.rabatte {
+				margin-left: 4rem;
+				width: calc(100% - 8rem);
+			}
+			paper-checkbox {	
+				min-width: 30%;
+				margin-bottom: 1.25rem;
+				--paper-checkbox-size: 1.25rem;
+				--paper-checkbox-label: {
+					font-family: sans-serif;  
+					padding-left: 1.25rem; 
+					font-size: 1.25rem;         
+				};
+			}
+			blockparent > p {
+				margin-bottom: .75rem;
+			}
+			vaadin-grid, #selectYear {
+				margin-left: 4rem;
+			}
+			vaadin-grid {
+				max-height: 45vh;
+				margin-bottom: 4rem;
+				--vaadin-grid-header-cell: {
+					flex-direction: row;
+					align-items: center;
+					font-size: 1.5rem;
+					padding-bottom: .5rem;
+				};
+			}
+			section > google-map {
+				height: 450px;
+				width: calc(100% - 8rem);
+				margin-top: 2rem;
+				margin-bottom: 4rem;
+				margin-left: 4rem;
+			}
+			google-map h4 {
+				margin: .85rem 0 .5rem 0;
+				font-size: 1.5rem;
+			}
+			google-map p {
+				line-height: 1.5;
+				font-size: 1.25rem;
+			}
+			google-map img {
+				margin: 1rem auto;
+				height: 215px;
+			}
+			section > .abschnitt > .li {
+				margin-bottom: .75rem;
+				width: 75%;
+				margin-left: 12.5%;
+			}
+		}
+
+		@media (min-width: 800px) {
+			#mainImage {
+				max-height: calc(100vh - var(--first-bar-height));
+			}
+			#closeImg {
+				top: 0;
+			}
+			paper-carousel {		
+				width: 80%;
+				left: 10%;
+			}
+			.galleryImage {
+				margin-top: calc((100vh - 80vw*.75) / 2);
+				width: 80%;
+				height: calc(80vw * .75);
+			}
+		}
+
+		@media (min-width: 1024px) {
+			#closeImg {
+				top: 1rem;
+				right: 0rem;
+				width: 5rem;
+				height: 5rem;
+			}
+			section {
+				margin: 2.5rem 0;
+			}
+			section#Lage {
+				height: 700px;
+			}
+			section > h3 {
+				font-size: 2.25rem;
+			}
+			section > p, section span.subline {
+				font-size: 1.35rem;
+				margin-bottom: 1rem;
+			}	
+			#icons > div {				
+				width: 120px;				
+			}
+			#icons > div:first-of-type {				
+				width: 130px;
+			}
+			section#Details paper-icon-button {
+				height: 120px;
+				width: 120px;
+				padding-left: 30px;
+				margin-bottom: -32px;
+			}
+			section#Details paper-icon-button#bed {
+				height: 130px;
+				width: 130px;
+			}			
+			.flex > *, .flex > h5, .flex-5 > *, .flex-5 > h5 {
+				min-width: 20%;
+			}
+			.flex > .vier {
+				display: none;
+			}
+			.flex-5 > div:nth-of-type(4) > p {
+				justify-content: center;
+			}
+			section#Preise > h3 {
+				margin-bottom: 1.5rem;
+			}
+			section#Preise > .flex-2 > div > p {
+				display: inline;	
+			}
+			section#Preise > .flex-2 > div > p:nth-of-type(1)::after {
+				content: ":";
+			}
+			section#Preise > .flex-2 > div:nth-of-type(5) > p:nth-of-type(1)::after {
+				content: "";
+			}
+			section#Preise > .flex-2 > div > p:nth-of-type(2) {
+				margin-left: .5rem;
+			}
+			section#Preise > .flex-2 > div:nth-of-type(5) > p > span {
+				margin-left: .75rem;
+			}
+			.rabatte {
+				margin-left: 4rem;
+				width: calc(100% - 4rem);
+			}
+			paper-checkbox {	
+				min-width: 25%;
+			}
+			blockparent > p {
+				margin-bottom: 1rem;
+			}
+			section > google-map {
+				height: 575px;
+				margin-bottom: 2rem;
+			}
+		}
+
+		@media (min-width: 1025px) {
+			#mainImage {
+				height: 450px;
+				width: 100%;
+			}
+			header > a > img {
+				padding-left: 2rem;
+				margin-top: .75rem;
+			}
+			#closeImg {
+				width: 4rem;
+				height: 4rem;
+				right: calc((100vw - 75vh/.75) / 2 - 2rem);
+			}
+			paper-carousel {
+				margin-top: 12.5vh;
+				margin-left: calc((100vw - 75vh/.75) / 2);
+				width: calc(75vh / .75);	
+				height: 75vh;
+				left: initial;
+			}
+			.galleryImage {
+				margin: 0;
+				width: calc(75vh / .75);	
+				height: 75vh;
+			}
+			paper-input {
+				--paper-input-container-underline-focus: {
+					font-weight: 100;
+					margin-top: 5px;
+				};
+			}
+			#icons {
+				max-width: 550px;
+				margin: 0 auto;
+			}
+			vaadin-grid {
+				--vaadin-grid-header-cell: {
+					flex-direction: row;
+					align-items: center;
+					font-size: 1.5rem;
+					padding-bottom: .75rem;
+				};
+			}
+			section > google-map {
+				height: 500px;
+				width: 100%;
+				margin-left: 0;
+			}
+			google-map img {
+				height: 200px;
+			}
+		}
+
+		@media (min-width: 1025px) and (max-height: 800px) {
+		}
+		@media (min-width: 1180px) {
+			#mainImage {
+				height: 550px;
+				max-height: initial;
+				width: 100%;
+			}
+			#secondBar > div > p {
+				padding-top: 2.25rem;
+			}
+		}
+		@media (min-width: 1366px) {
+			:host {
+				--paper-tooltip: {
+					margin-top: -7rem;
+					margin-left: -5.5rem;
+					font-size: .75rem;
+					text-align: center;
+					opacity: 1;
+					background: #000;
+					letter-spacing: 1px;
+				};
+			}
+			#headImgCont {
+				display: flex;
+				justify-content: space-around;
+				align-items: flex-start;
+			}
+			#mainImage, #secondImage {
+				width: 45vw;
+			    --iron-image-width: 45vw;
+				--iron-image-height: calc(45vw * 2.85/4);
+				height: calc(45vw * 2.85/4);
+				margin-top: var(--first-bar-height);
+			}
+			header > a > img {
+				margin-top: 1rem;
+	    		padding: 0;
+				padding-left: 4.5vw;
+				height: 2.75rem;
+    			width: 2.75rem;
+			}
+			.menu-icon[icon] {
+				margin-right: 3.5vw;
+			}
+			#price {
+				right: 3.5rem;
+			}
+			#priceIcon {
+				right: 4.5rem;
+			}
+			#secondBar > paper-fab {
+				margin-left: 5vw;
+				margin-bottom: 1.5rem;				
+			}
+			#secondBar > div {
+				margin-right: 3.5vw;
+			}
+			.navBar {
+				width: 95%;
+				margin-left: 2.5%;
+				margin-top: 5px;
+			}
+			.rabatte {
+				width: calc(80% - 4rem);
+				margin-left: calc(12.5% + 4rem);
+			}
+			section > google-map {
+				height: 600px;
+				width: 95vw;
+				margin-left: 2.5vw; 
+			}
+		}
+
+		@media (min-width: 1366px) and (max-height: 768px) {
+		}
+		@media (min-width: 1500px) {
+			#suchLupe.js-pushed {
+				transform: translateX(4rem);
+			}
+		}
+
+		</style>
+
+		<iron-media-query query="min-width: 1366px" query-matches="{{bigScreen}}"></iron-media-query>
+		<iron-ajax url="../data/14895.json" last-response="{{data}}" auto=""></iron-ajax>
+		<div id="headImgCont">
+			<iron-image id="mainImage" on-tap="openImages" sizing="cover" src="[[data.imagePath]]" preload="" fade=""></iron-image>	
+			<template is="dom-if" if="[[bigScreen]]">
+				<iron-image id="secondImage" on-tap="openImages" src="[[data.rightImg]]" preload="" fade=""></iron-image>
+			</template>
+			
+		</div>
+		<header id="firstBar">	
+			<a href="https://gastgeber-26fc4.firebaseapp.com/index.html">
+				<img class="tlbrimg" src="../images/globus.png" alt="GastgeberNet">
+			</a>
+			<div>
+				<form id="schnellsuche" on-keypress="checkEnter" action="https://eu.httpbin.org/get" type="get">	
+						<paper-input id="input" on-dblclick="submit" on-tap="move" name="name" label="Suchen" value="{{anfrage}}" auto-validate="" prevent-invalid-input="" allowed-pattern="[a-zA-Z\s\.äöüß-]" maxlength="50" required=""></paper-input>	
+						<input name="eingabe" value="[[anfrage]]" hidden="">
+				</form>		
+				<paper-icon-button id="suchLupe" on-tap="submit" icon="gastgeber-icons:search"></paper-icon-button>		
+			</div>				
+			<a href="http://gastgeber.net/asps/eing/1_Eingabe.asp" id="anmelden">Anmelden</a>	
+			<span id="sprachwahl">
+				<svg id="svg1" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+					<title>Sprachauswahl</title>
+					<defs></defs>
+					<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+						<g id="svg1Fill" fill="#19b3ec">
+							<path d="M7.41421356,9 L8.29055233,8.12366123 C9.26057586,7.1536377 9.9996249,5.37060807 9.99999986,4 L12,4 L12,2 L7,2 L7,0 L5,0 L5,2 L0,2 L0,4 L7.99999973,4 C7.99956262,4.84020479 7.4713745,6.11441194 6.87633877,6.70944767 L6,7.58578644 L5.12366123,6.70944767 C4.94063656,6.526423 4.76393628,6.27914249 4.6069729,6 L2.40706289,6 L2.40706289,6 C2.71635745,6.81752931 3.17827325,7.59248681 3.70944767,8.12366123 L4.58578644,9 L1.29289322,12.2928932 L2.70710678,13.7071068 L6,10.4142136 L8.81934895,13.2335625 L9.65123928,11.2370257 L7.41421356,9 L7.41421356,9 Z M11.25,17 L10,20 L8,20 L13,8 L14,8 L15,8 L20,20 L18,20 L16.75,17 L11.25,17 L11.25,17 Z M12.0833333,15 L14,10.4 L15.9166667,15 L12.0833333,15 L12.0833333,15 Z"></path>
+						</g>
+					</g>
+				</svg>
+				<p>DE</p>
+				<div class="dropdown-lang">
+					<ul>
+						<li><a href="http://www.accommodation.de">English</a></li>
+					</ul>
+				</div>
+				<svg id="svg2" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+					<title>Sprachwahl ausklappen</title>
+					<defs></defs>
+					<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+						<g id="dropdown">
+							<polygon points="9.29289322 12.9497475 10 13.6568542 15.6568542 8 14.2426407 6.58578644 10 10.8284271 5.75735931 6.58578644 4.34314575 8"></polygon>
+						</g>
+					</g>									
+				</svg>
+			</span>			
+			<paper-icon-button class="menu-icon" on-tap="back" icon="gastgeber-icons:arrow-back" drawer-toggle=""></paper-icon-button>
+		</header>	
+		<!--?xml version="1.0" encoding="utf-8"?-->
+		<!-- Generated by IcoMoon.io -->
+		
+		<svg id="price" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
+		<path id="priceColor" d="M16 8l-2.2-1.6 1.1-2.4-2.7-0.2-0.2-2.7-2.4 1.1-1.6-2.2-1.6 2.2-2.4-1.1-0.2 2.7-2.7 0.2 1.1 2.4-2.2 1.6 2.2 1.6-1.1 2.4 2.7 0.2 0.2 2.7 2.4-1.1 1.6 2.2 1.6-2.2 2.4 1.1 0.2-2.7 2.7-0.2-1.1-2.4 2.2-1.6z"></path>
+		</svg>		
+		<div id="priceIcon"><div>ab</div><span>[[data.priceMinLSDay]]</span></div>		
+		<div id="tooltipHost">
+			<paper-tooltip for="priceIcon" animation-delay="50">
+				Preis in € für [[data.Anzahl]] Personen/Nacht in der Nebensaison
+				</paper-tooltip>
+		</div>
+		<div id="secondBar">			
+			<paper-fab on-tap="openImages" icon="gastgeber-icons:camera" title="Bilder ansehen"></paper-fab>		
+			<div>					
+				<p>[[data.fewoTyp]] [[data.fewoName]] [[active]]</p>				
+			</div>
+		</div>
+		<more-images id="imageBox" modal="">		
+			<!-- Größe der controls für prev/next item im Element geändert -->	
+			<paper-carousel id="carousel" items="1" controls="true" dots="true" dottext="false">		
+				<template is="dom-repeat" items="[[data.gallery]]">
+					<iron-image class="galleryImage" sizing="cover" src="http://www.gastgeber.net/Homepage/jpgs/[[data.fewoId]]_[[item]].jpg" preload="" fade=""></iron-image>
+				</template>				
+			</paper-carousel>			
+			<paper-icon-button id="closeImg" icon="gastgeber-icons:close-big" dialog-dismiss=""></paper-icon-button>
+		</more-images>
+		<app-box threshold="[[offset]]" class="navBar">
+			<paper-tabs id="tabs" selected="{{route}}" attr-for-selected="nav" autoselect="" autoselect-delay="500">
+					<paper-tab nav="Details">Details</paper-tab>
+					<paper-tab nav="Preise">Preise</paper-tab>
+					<paper-tab nav="Lage">Lage</paper-tab>
+					<paper-tab nav="Buchung">Buchung<span>&nbsp;anfragen</span></paper-tab>
+			</paper-tabs>		
+		</app-box>
+		<main>			
+			<iron-lazy-pages attr-for-selected="data-route" selected="{{route}}" loading="{{loading}} hide-immediately">
+				<template is="iron-lazy-page" data-route="Details">				
+					<section id="Details">
+						<h3>[[data.slogan]]</h3>
+						<p>[[data.place]], [[data.subReg]]</p>
+						<div class="abschnitt">							
+							<span id="icons">
+								<div>
+									<paper-icon-button id="home" icon="gastgeber-icons:home" noink=""></paper-icon-button>
+									<div class="fewoTyp">[[data.fewoBezeichnung]]</div>
+								</div>
+								<div>
+									<paper-icon-button id="group" icon="gastgeber-icons:group" noink=""></paper-icon-button>
+									<div>[[data.maxPs]]</div><div>[[data.gast]]</div>
+								</div>						
+								<div>
+									<paper-icon-button id="bed" icon="gastgeber-icons:bed" noink=""></paper-icon-button>
+									<div>[[data.Betten]]</div><div>[[data.bett]]</div>
+								</div>
+								<div>
+									<paper-icon-button id="wallet" icon="gastgeber-icons:wallet" noink=""></paper-icon-button>
+									<div>[[data.Zimmer]]</div><div>Zimmer</div>
+								</div>
+							</span>		
+						</div>
+						<div class="abschnitt">
+							<h5>Beschreibung</h5>
+							<p>[[data.fewoTxt]]</p>
+						</div>
+						<div class="abschnitt flex flex-5">
+							<h5>Übersicht</h5>
+							<div>
+								<p>Größe in m²: [[data.sizeMin]]</p>
+								<p>Gäste: [[data.AnzahlMin]] bis [[data.AnzahlMax]]</p>
+								<p>Objekte: [[data.Objekte]]</p>
+							</div>
+							<div>
+								<p>Wohnräume: [[data.WohnR]]</p>
+								<p>Wohn-Schlafzimmer: [[data.WohnSZ]]</p>
+								<p>Schlafzimmer: [[data.SZ]]</p>
+							</div>
+							<div class="vier">								
+							</div>
+							<div class="kueche">
+								<p>[[data.Kochen]]</p>
+							</div>
+							<div>
+								<p>Bad/WC: [[data.Bad]]</p>
+								<p>Dusche/WC: [[data.Dusche]]</p>
+								<p>Gäste-WC: [[data.ExtraWC]]</p>
+							</div>
+						</div>
+						<div class="abschnitt flex">
+							<h5>Ausstattung</h5>
+							<div>								
+								<template is="dom-repeat" items="[[data.Ausstattung1]]">
+									<p class$="[[item.class]]">[[item.Objekt]]</p>
+								</template>
+							</div>
+							<div>								
+								<template is="dom-repeat" items="[[data.Ausstattung2]]">
+									<p class$="[[item.class]]">[[item.Objekt]]</p>
+								</template>
+							</div>
+							<div class="vier">								
+							</div>
+							<div>								
+								<template is="dom-repeat" items="[[data.Ausstattung3]]">
+									<p class$="[[item.class]]">[[item.Objekt]]</p>
+								</template>
+							</div>
+						</div>						
+						<div class="abschnitt flex">
+							<h5>Allgemein</h5>
+							<div>								
+								<template is="dom-repeat" items="[[data.Allgemein1]]">
+									<p class$="[[item.class]]">[[item.Objekt]]</p>
+								</template>
+							</div>
+							<div>								
+								<template is="dom-repeat" items="[[data.Allgemein2]]">
+									<p class$="[[item.class]]">[[item.Objekt]]</p>
+								</template>
+							</div>
+							<div class="vier">								
+							</div>
+							<div>								
+								<template is="dom-repeat" items="[[data.Allgemein3]]">
+									<p class$="[[item.class]]">[[item.Objekt]]</p>
+								</template>
+							</div>
+						</div>
+					</section>
+				</template>
+				<template is="iron-lazy-page" data-route="Preise">	
+					<section id="Preise">
+						<template is="dom-if" if="[[!data.diffView]]">						
+							<h3>Kurzübersicht</h3>
+							<div class="abschnitt flex flex-2">
+								<div><p>Hauptsaison</p><p>EUR [[data.HS]]</p></div>
+								<div><p>Nebensaison</p><p>EUR [[data.NSMin]] bis [[data.NSMax]]</p></div>
+								<div><p>Preis</p><p>pro [[data.Preisbasis]]/[[data.Preisdauer]]</p></div>
+								<div><p>Termine Hauptsaison</p><p>[[data.HSAnfang]] - [[data.HSEnde]]</p></div>
+								<div><p>Optionale Kosten: <span>[[data.Extrakosten]]</span></p></div>
+							</div>	
+						</template>	
+						<template is="dom-if" if="[[data.diffView]]">							
+							<h3>Detaillierte Übersicht</h3>
+							<div class="abschnitt">
+								<div>
+									<h4>Preis pro [[data.diffDauerBasis]] und [[data.Preisbasis]]</h4>
+								</div>					
+							</div>
+							<paper-checkbox id="selectYear" checked="{{showNextYear}}">Preise für [[data.nextYear]]</paper-checkbox>
+							<vaadin-grid id="diffPrice" items="[[data.dates2017]]" hidden="[[showNextYear]]">
+								<vaadin-grid-column-group>			
+									<template class="header">[[data.currentYear]]</template>
+									<vaadin-grid-column>										
+										<template class="header">Zeitraum</template>
+										<template><span class$="[[item.color]]"></span><div>[[item.dateFirst]] - [[item.dateLast]]</div></template>
+									</vaadin-grid-column>
+									<vaadin-grid-column>
+										<template class="header">Preis</template>
+										<template>[[item.price]]</template>				
+									</vaadin-grid-column>
+								</vaadin-grid-column-group>
+							</vaadin-grid>						
+							<vaadin-grid id="diffPrice" items="[[data.dates2018]]" hidden="[[!showNextYear]]">
+								<vaadin-grid-column-group>			
+									<template class="header">[[data.nextYear]]</template>
+									<vaadin-grid-column>							
+										<template class="header">Zeitraum</template>
+										<template><span class$="[[item.color]]"></span>[[item.dateFirst]] - [[item.dateLast]]</template>
+									</vaadin-grid-column>
+									<vaadin-grid-column>
+										<template class="header">Preis</template>
+										<template>[[item.price]]</template>				
+									</vaadin-grid-column>
+								</vaadin-grid-column-group>
+							</vaadin-grid>								
+						</template>						
+						<div class="abschnitt rabatte">
+							<template is="dom-repeat" items="[[data.Rabatte]]">
+								<paper-checkbox disabled="" checked="[[item.checked]]">[[item.content]]</paper-checkbox>
+							</template>							
+						</div>			
+						<h4>Mietkonditionen</h4>
+						<div class="abschnitt blockparent">
+							<p>Mindestmietzeit: [[data.minZeit]] [[data.minZeitBasis]]</p>
+							<p>Weitere Informationen: [[data.Info]]</p>
+							<p>[[data.Hund]][[data.Katze]] [[data.PreisJeHund]][[data.PreisJeKatze]][[data.Euro]]</p>
+						</div>		
+					</section>
+				</template>
+				<template is="iron-lazy-page" data-route="Lage">	
+					<section id="Lage">
+						<h3>[[data.place]] </h3><span class="subline">([[data.subReg]])</span>
+						<google-map latitude="[[data.lat]]" longitude="[[data.long]]" min-zoom="7" max-zoom="17" zoom="15" language="de" fit-to-markers="" disable-street-view-control="" disable-zoom="" api-key="AIzaSyCFu_iYtE7k0JxZJDIgNhnZYGlBdE5HjuU">
+							<google-map-marker latitude="[[data.lat]]" longitude="[[data.long]]" animation="DROP" label="[[data.fewoName]]" title="[[data.fewoTyp]] [[data.fewoName]]" draggable="true" open="true">
+								<h4>[[data.fewoTyp]] [[data.fewoName]]</h4>
+								<p>[[data.addressStreet]]</p>
+								<p>[[data.addressLoc]]</p>
+								<img src$="[[data.mapImg]]">
+							</google-map-marker>
+						</google-map>
+						<div class="abschnitt">
+							<h5>Tagesausflüge</h5>							
+							<template is="dom-repeat" items="[[data.Tagesausfluege]]">
+								<p class="li">- [[item]]</p>
+							</template>
+						</div>
+						<div class="abschnitt">
+							<h5>Sport &amp; Freizeit</h5>
+								<p class="li">- Sportmöglichkeiten: <template is="dom-repeat" items="[[data.Sport]]">[[item]]<span hidden$="[[computeHiddenCommaSport(index)]]">,</span> </template></p>	
+								<p class="li">- Freizeitangebote in der Nähe: <template is="dom-repeat" items="[[data.Freizeit]]">[[item]]<span hidden$="[[computeHiddenCommaFreizeit(index)]]">,</span> </template></p>	
+								<p class="li">- Kulturelle Angebote: <template is="dom-repeat" items="[[data.Kultur]]">[[item]]<span hidden$="[[computeHiddenCommaKultur(index)]]">,</span> </template></p>	
+						</div>
+					</section>
+				</template>
+				<template is="iron-lazy-page" data-route="Buchung">	
+					<section id="Buchung">
+						<h3>unverbindliche Anfrage</h3>
+						<p>(Mindestzeitraum: [[data.minZeit]] Übernachtungen)</p>
+ 						<!-- WebComponentsReady event listener für FF entfernt, i18 und Styling direkt im Element geändert -->
+						<paper-input id="inputAnreise" label="Anreise" on-tap="showCalAnreise" on-change="_checkForEnterAnreise" value="[[_setAnreise(anreiseDatum)]]"></paper-input>
+						<paper-input id="inputAbreise" label="Abreise" on-tap="showCalAbreise" on-change="_checkForEnterAbreise" value="[[_setAbreise(anreiseDatum, abreiseDatum)]]"></paper-input>
+						<calendar-lite id="startDate" date="{{anreiseDatum}}"></calendar-lite>
+						<calendar-lite id="endDate" date="{{abreiseDatum}}"></calendar-lite>
+					</section>
+				</template>
+			</iron-lazy-pages>			
+			<paper-spinner active="[[loading]]"></paper-spinner>
+		</main>
+		<footer>
+
+		</footer>
+
+	</template>
+
+	<script>Polymer({is:"gastgeber-objekt",behaviors:[Polymer.IronResizableBehavior],properties:{bigScreen:{type:Boolean},anfrage:{type:String,value:"",notify:!0},offset:{type:Number,notify:!0},loading:{type:Boolean,notify:!0},anreiseDatum:{type:Date},abreiseDatum:{type:Date},data:{type:Object}},listeners:{"iron-resize":"_onIronResize","date-change":"_disableCal"},_getOffset:function(){if(window.innerWidth>=568&&window.innerWidth<740){var e=this.$.mainImage.clientHeight;this.offset=e}else{var e=this.$.mainImage.clientHeight,t=this.$.firstBar.clientHeight,n=e+t;this.offset=n}},attached:function(){this.async(this._getOffset,75)},ready:function(){this.$.tabs.selected="Details"},_checkForEnterAnreise:function(e){this._disableCal();var t=e.target.value,n=t.indexOf("."),i=t.slice(0,n),a=t.lastIndexOf("."),s=t.slice(n+2,a),o=t.slice(a+2,t.length),r=new Date(o,s-1,i);document.querySelector("#startDate").date=r},_checkForEnterAbreise:function(e){this._disableCal();var t=e.target.value,n=t.indexOf("."),i=t.slice(0,n),a=t.lastIndexOf("."),s=t.slice(n+2,a),o=t.slice(a+2,t.length),r=new Date(o,s-1,i);document.querySelector("#endDate").date=r},showCalAnreise:function(){document.querySelector("#startDate").style.display="block",document.querySelector("#endDate").style.display="none"},showCalAbreise:function(){document.querySelector("#endDate").style.display="block",document.querySelector("#startDate").style.display="none"},_disableCal:function(e){document.querySelector("#startDate").style.display="none",document.querySelector("#endDate").style.display="none"},_setAnreise:function(e){var t=e.getDate(),n=e.getMonth()+1,i=e.getFullYear(),a=t+". "+n+". "+i;return a},_setAbreise:function(e,t){if(t.getDate()-e.getDate()<this.data.minZeit){var n=e.getDate()+this.data.minZeit,i=e.getMonth()+1,a=e.getFullYear(),s=n+". "+i+". "+a,o=new Date(a,i-1,n);return this.abreiseDatum=o,s}var r=t.getDate(),i=t.getMonth()+1,a=t.getFullYear(),s=r+". "+i+". "+a;return s},_onIronResize:function(){this._getOffset()},submit:function(){this.$.schnellsuche.submit()},move:function(){this.$.suchLupe.classList.add("js-pushed")},checkEnter:function(){window.event&&13==window.event.which&&this.$.schnellsuche.submit()},back:function(){history.back()},openImages:function(){this.$.imageBox.toggle()},computeHiddenCommaSport:function(e){return this.data.Sport.length-1===e},computeHiddenCommaFreizeit:function(e){return this.data.Freizeit.length-1===e},computeHiddenCommaKultur:function(e){return this.data.Kultur.length-1===e},_addEuro:function(e){}});</script>
+</dom-module></body></html>
